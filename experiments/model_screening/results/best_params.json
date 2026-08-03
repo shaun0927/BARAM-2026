@@ -1,0 +1,68 @@
+{
+  "baseline": {
+    "local_score": 0.6207259749,
+    "public_lb": 0.6220908318,
+    "alpha": 1.0275
+  },
+  "best_model": {
+    "model_id": "lgbm_l1_baseline",
+    "model_family": "LightGBM",
+    "raw_score": 0.6117673564727266,
+    "raw_1_nmae": 0.8700286771288893,
+    "raw_ficr": 0.3535060358165638,
+    "best_alpha": 1.03,
+    "alpha_score": 0.6213552467009833,
+    "alpha_1_nmae": 0.8712021483970117,
+    "alpha_ficr": 0.37150834500495483,
+    "delta_vs_baseline": 0.0006292718009832665,
+    "worst_month_score": 0.6026838369238885,
+    "high_generation_score": 0.6159288142378625,
+    "group_1_score": 0.6455045729023654,
+    "group_2_score": 0.6553938738628603,
+    "group_3_score": 0.5631672933377241,
+    "train_seconds": NaN,
+    "predict_seconds": NaN,
+    "total_seconds": 0.0,
+    "status": "ok",
+    "notes": "current B1 baseline parameters; loaded cached prediction",
+    "months_better_than_lgbm": 0.0,
+    "groups_better_than_lgbm": 0.0
+  },
+  "best_ensemble": {
+    "ensemble_id": "w3_lgbm_l1_baseline_catboost_mae_hist_gbdt_l2_0.7_0.1_0.2",
+    "model_id": "w3_lgbm_l1_baseline_catboost_mae_hist_gbdt_l2_0.7_0.1_0.2",
+    "members": "lgbm_l1_baseline+catboost_mae+hist_gbdt_l2",
+    "weights": "{\"lgbm_l1_baseline\": 0.7, \"catboost_mae\": 0.1, \"hist_gbdt_l2\": 0.2}",
+    "best_alpha": 1.03,
+    "alpha_score": 0.6220628143285927,
+    "alpha_1_nmae": 0.8721273947713679,
+    "alpha_ficr": 0.37199823388581743,
+    "avg_nmae": 0.12787260522863209,
+    "worst_month_score": 0.5979793105155076,
+    "high_generation_score": 0.6163130623492746,
+    "delta_vs_baseline": 0.00133683942859264
+  },
+  "selected_candidate_kind": "ensemble",
+  "selected_candidate": {
+    "ensemble_id": "w3_lgbm_l1_baseline_catboost_mae_hist_gbdt_l2_0.7_0.1_0.2",
+    "model_id": "w3_lgbm_l1_baseline_catboost_mae_hist_gbdt_l2_0.7_0.1_0.2",
+    "members": "lgbm_l1_baseline+catboost_mae+hist_gbdt_l2",
+    "weights": "{\"lgbm_l1_baseline\": 0.7, \"catboost_mae\": 0.1, \"hist_gbdt_l2\": 0.2}",
+    "best_alpha": 1.03,
+    "alpha_score": 0.6220628143285927,
+    "alpha_1_nmae": 0.8721273947713679,
+    "alpha_ficr": 0.37199823388581743,
+    "avg_nmae": 0.12787260522863209,
+    "worst_month_score": 0.5979793105155076,
+    "high_generation_score": 0.6163130623492746,
+    "delta_vs_baseline": 0.00133683942859264
+  },
+  "submission_info": null,
+  "package_status": {
+    "xgboost": true,
+    "catboost": true,
+    "tabm": false,
+    "tabpfn": false,
+    "autogluon": false
+  }
+}
