@@ -1,2 +1,3 @@
 __pycache__/
 *.py[cod]
+experiments/cv_protocol/official_eval_download/nuxt/

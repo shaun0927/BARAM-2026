@@ -46,9 +46,5 @@ Notes:
 
 - Splits are timestamp-based, never weather-grid-row based.
 - NMAE is implemented from the public competition definition.
-- The official evaluation page confirms that group FICR is acquired settlement divided by theoretical maximum settlement, averaged over the 3 groups.
-- The exact per-hour settlement payment table is in DACON's code-download attachment, which was not accessible from the unauthenticated browser session. Until that file is obtained, FICR is implemented as a proxy using common settlement thresholds:
-  - hourly normalized error <= 6%: full incentive
-  - hourly normalized error <= 8%: 75% incentive
-  - otherwise: 0
-- If the official DACON evaluation code is available later, replace `compute_ficr_proxy` and rerun.
+- FICR is implemented from the official DACON code-share notebook saved at `official_eval_download/official_eval_code.ipynb`.
+- Official FICR uses normalized error thresholds of 6%/8%, unit prices 4/3/0, and settlement weighted by actual generation.

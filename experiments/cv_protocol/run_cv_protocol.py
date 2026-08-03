@@ -118,13 +118,15 @@ def merge_features_labels(features: pd.DataFrame, labels: pd.DataFrame) -> pd.Da
     return features.merge(labels, left_on="forecast_kst_dtm", right_on="kst_dtm", how="inner", suffixes=("", "_label"))
 
 
-def compute_ficr_proxy(abs_err_norm: pd.Series) -> float:
-    incentive = np.select(
+def compute_ficr(abs_err_norm: pd.Series, actual: pd.Series) -> float:
+    unit_price = np.select(
         [abs_err_norm <= 0.06, abs_err_norm <= 0.08],
-        [1.0, 0.75],
+        [4.0, 3.0],
         default=0.0,
     )
-    return float(np.mean(incentive)) if len(incentive) else np.nan
+    earned_settlement = float(np.sum(actual.to_numpy(dtype=float) * unit_price))
+    max_settlement = float(np.sum(actual.to_numpy(dtype=float) * 4.0))
+    return earned_settlement / max_settlement if max_settlement else np.nan
 
 
 def evaluate_predictions(
@@ -147,7 +149,7 @@ def evaluate_predictions(
             continue
         abs_err_norm = (pred[mask] - actual[mask]).abs() / cap
         nmae = float(abs_err_norm.mean())
-        ficr = compute_ficr_proxy(abs_err_norm)
+        ficr = compute_ficr(abs_err_norm, actual[mask])
         nmaes.append(nmae)
         ficrs.append(ficr)
         group_rows.append({"target": target, "nmae": nmae, "ficr": ficr, "eligible_hours": int(mask.sum())})
@@ -255,7 +257,7 @@ def summarize_experiment(exp_id: str, model_name: str, feature_set: str, window:
         "window": window.name,
         "score": metrics["score"],
         "one_minus_nmae": metrics["one_minus_nmae"],
-        "ficr_proxy": metrics["ficr"],
+        "ficr": metrics["ficr"],
         "avg_nmae": metrics["avg_nmae"],
         "eligible_hours": metrics["eligible_hours"],
         "worst_month_score": min(m["score"] for m in metrics["monthly_rows"]),
@@ -263,7 +265,7 @@ def summarize_experiment(exp_id: str, model_name: str, feature_set: str, window:
     }
     for g in metrics["group_rows"]:
         row[f"{g['target']}_nmae"] = g["nmae"]
-        row[f"{g['target']}_ficr_proxy"] = g["ficr"]
+        row[f"{g['target']}_ficr"] = g["ficr"]
         row[f"{g['target']}_eligible_hours"] = g["eligible_hours"]
     return row
 
@@ -273,7 +275,7 @@ def classify_windows(summary: pd.DataFrame, monthly: pd.DataFrame, group: pd.Dat
     by_window = focus.groupby("window", as_index=False).agg(
         score=("score", "mean"),
         avg_nmae=("avg_nmae", "mean"),
-        ficr_proxy=("ficr_proxy", "mean"),
+        ficr=("ficr", "mean"),
         worst_month_score=("worst_month_score", "mean"),
         high_generation_score=("high_generation_score", "mean"),
     )
@@ -357,14 +359,13 @@ def write_conclusion(out_dir: Path, summary: pd.DataFrame, verdicts: pd.DataFram
     lines.append(json.dumps(package_versions, indent=2, ensure_ascii=False))
     lines.append("```\n")
     lines.append("## Top Experiments\n")
-    lines.append(best_rows[["experiment_id", "model", "feature_set", "window", "score", "avg_nmae", "ficr_proxy", "worst_month_score", "high_generation_score"]].to_markdown(index=False))
+    lines.append(best_rows[["experiment_id", "model", "feature_set", "window", "score", "avg_nmae", "ficr", "worst_month_score", "high_generation_score"]].to_markdown(index=False))
     lines.append("\n## Window Verdicts\n")
-    lines.append(verdicts[["window", "score", "avg_nmae", "ficr_proxy", "worst_month_score", "delta_score_vs_W3", "delta_nmae_vs_W3", "months_improved_vs_W3", "groups_improved_vs_W3", "verdict", "reason"]].to_markdown(index=False))
+    lines.append(verdicts[["window", "score", "avg_nmae", "ficr", "worst_month_score", "delta_score_vs_W3", "delta_nmae_vs_W3", "months_improved_vs_W3", "groups_improved_vs_W3", "verdict", "reason"]].to_markdown(index=False))
     lines.append("\n## Recommended Train Policy\n")
     lines.append(policy)
     lines.append("\n## Caveats\n")
-    lines.append("- The official page confirms the group FICR structure, but the exact per-hour settlement table remains in a DACON code-download attachment that was not accessible in this run.")
-    lines.append("- FICR therefore uses a 6%/8% threshold proxy until the official code attachment is obtained.")
+    lines.append("- FICR now follows the official DACON code-share notebook: error-rate thresholds 6%/8%, unit prices 4/3/0, settlement weighted by actual generation.")
     lines.append("- Public/private LB calibration still needs actual submissions.")
     lines.append("- Group 3 has only 2023-2024 usable labels, so its train-window evidence is weaker.")
     (out_dir / "conclusion.md").write_text("\n".join(lines), encoding="utf-8")
