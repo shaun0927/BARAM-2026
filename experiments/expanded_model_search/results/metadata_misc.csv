@@ -1,0 +1,3 @@
+﻿model_id,model_family,status,notes,train_seconds,predict_seconds
+ngboost_normal,NGBoost,ok,NGBoost Normal distribution first-pass sampled,202.572411799978,11.18998169992119
+explainable_boosting,ExplainableBoostingMachine,ok,EBM first-pass sampled,136.98395259998506,0.17009079997660592

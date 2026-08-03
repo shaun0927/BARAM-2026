@@ -1,0 +1,2 @@
+﻿model_id,model_family,status,notes,train_seconds,predict_seconds
+pycaret_compare,PyCaret,ok,"PyCaret compare_models first-pass; budget_time_minutes=0.5; leaders={'kpx_group_1': 'RandomForestRegressor(n_jobs=-1, random_state=42)', 'kpx_group_2': 'RandomForestRegressor(n_jobs=-1, random_state=42)', 'kpx_group_3': 'ExtraTreesRegressor(n_jobs=-1, random_state=42)'}",445.23168520006584,2.304634600004647

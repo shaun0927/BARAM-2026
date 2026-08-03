@@ -1,0 +1,23 @@
+﻿model_id,model_family,status,notes,train_seconds,predict_seconds
+lgbm_l1_baseline,LightGBM,ok,current B1/W4 baseline model; included as anchor; loaded cached prediction,,
+elastic_net,linear,ok,previously deferred; first-pass linear sparse baseline; loaded cached prediction,,
+huber_regressor,linear,ok,previously deferred; robust linear baseline; loaded cached prediction,,
+sgd_huber,linear,ok,fast robust linear SGD surrogate; loaded cached prediction,,
+knn_distance,neighbors,ok,distance-weighted KNN with robust scaling; loaded cached prediction,,
+radius_neighbors,neighbors,ok,radius neighbor feasibility with fallback outlier label,0.4655876999604516,2.6380686999764293
+linear_svr,svm,ok,linear SVR sampled first-pass; loaded cached prediction,,
+nystroem_ridge,kernel,ok,kernel approximation + ridge; nonlinear low-rank diversity; loaded cached prediction,,
+svr_rbf_sampled,svm,ok,sampled RBF SVR feasibility; loaded cached prediction,,
+mlp_regressor,neural_sklearn,ok,sklearn MLP first-pass tabular neural baseline; loaded cached prediction,,
+hist_gbdt_absolute,sklearn HistGradientBoosting,ok,sklearn boosting absolute-error variant; loaded cached prediction,,
+gradient_boosting_quantile,sklearn GradientBoosting,ok,quantile boosting q=0.55 for underprediction-bias diversity; loaded cached prediction,,
+extra_trees_wide,sklearn ExtraTrees,ok,bagging diversity; wider than #4 first run; loaded cached prediction,,
+random_forest_wide,sklearn RandomForest,ok,bagging diversity; wider than #4 first run; loaded cached prediction,,
+xgboost_pseudohuber,XGBoost,ok,XGBoost pseudo-Huber objective first-pass; loaded cached prediction,,
+xgboost_squarederror,XGBoost,ok,XGBoost squared-error diversity baseline; loaded cached prediction,,
+catboost_rmse,CatBoost,ok,CatBoost RMSE first-pass diversity; loaded cached prediction,,
+catboost_quantile_055,CatBoost,ok,CatBoost Quantile q=0.55 first-pass; loaded cached prediction,,
+flaml_automl,FLAML AutoML,ok,loaded cached prediction,,
+h2o_automl,H2O AutoML,ok,loaded cached prediction,,
+tabpfn_regressor,TabPFN,failed,TabPFN requires one-time Prior Labs license/API-key authentication before local weight download; non-interactive run failed with OSError WinError 10038,,
+tabm_torch,TabM,ok,TabM torch wrapper first-pass; epochs=8; sampled rows,38.43410130002303,4.513060700031929

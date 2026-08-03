@@ -1,0 +1,93 @@
+{
+  "baseline": {
+    "local_score": 0.6207259749,
+    "public_lb": 0.6220908318,
+    "alpha": 1.0275,
+    "accept_score": 0.6222259749
+  },
+  "best_model": {
+    "model_id": "catboost_quantile_055",
+    "model_family": "CatBoost",
+    "raw_score": 0.6188512296904316,
+    "raw_1_nmae": 0.8706411815873153,
+    "raw_ficr": 0.36706127779354786,
+    "best_alpha": 1.025,
+    "alpha_score": 0.622655108214881,
+    "alpha_1_nmae": 0.8703161948782733,
+    "alpha_ficr": 0.3749940215514888,
+    "avg_nmae": 0.1296838051217267,
+    "delta_vs_baseline": 0.001929133314880982,
+    "worst_month_score": 0.5932831179721162,
+    "high_generation_score": 0.6292680247808355,
+    "group_1_score": 0.6423261945785509,
+    "group_2_score": 0.6514561242472232,
+    "group_3_score": 0.574183005818869,
+    "train_seconds": NaN,
+    "predict_seconds": NaN,
+    "status": "ok",
+    "notes": "CatBoost Quantile q=0.55 first-pass; loaded cached prediction",
+    "months_better_than_lgbm": 6.0,
+    "groups_better_than_lgbm": 1.0
+  },
+  "best_ensemble": {
+    "ensemble_id": "w3_catboost_quantile_055_lgbm_l1_baseline_extra_trees_wide_0.60_0.20_0.20",
+    "model_id": "w3_catboost_quantile_055_lgbm_l1_baseline_extra_trees_wide_0.60_0.20_0.20",
+    "members": "catboost_quantile_055+lgbm_l1_baseline+extra_trees_wide",
+    "weights": "{\"catboost_quantile_055\": 0.6, \"lgbm_l1_baseline\": 0.2, \"extra_trees_wide\": 0.2}",
+    "best_alpha": 1.03,
+    "alpha_score": 0.6260900871556871,
+    "alpha_1_nmae": 0.8730840482283418,
+    "alpha_ficr": 0.37909612608303256,
+    "avg_nmae": 0.12691595177165818,
+    "delta_vs_baseline": 0.005364112255687115,
+    "worst_month_score": 0.6012469332924494,
+    "high_generation_score": 0.626865165838502
+  },
+  "selected_candidate_kind": "ensemble",
+  "selected_candidate": {
+    "ensemble_id": "w3_catboost_quantile_055_lgbm_l1_baseline_extra_trees_wide_0.60_0.20_0.20",
+    "model_id": "w3_catboost_quantile_055_lgbm_l1_baseline_extra_trees_wide_0.60_0.20_0.20",
+    "members": "catboost_quantile_055+lgbm_l1_baseline+extra_trees_wide",
+    "weights": "{\"catboost_quantile_055\": 0.6, \"lgbm_l1_baseline\": 0.2, \"extra_trees_wide\": 0.2}",
+    "best_alpha": 1.03,
+    "alpha_score": 0.6260900871556871,
+    "alpha_1_nmae": 0.8730840482283418,
+    "alpha_ficr": 0.37909612608303256,
+    "avg_nmae": 0.12691595177165818,
+    "delta_vs_baseline": 0.005364112255687115,
+    "worst_month_score": 0.6012469332924494,
+    "high_generation_score": 0.626865165838502
+  },
+  "accepted": true,
+  "submission_info": {
+    "created": true,
+    "path": "C:\\Users\\USER\\Desktop\\jh0927\\BARAM-2026\\experiments\\expanded_model_search\\submissions\\submission_w3_catboost_quantile_055_lgbm_l1_baseline_extra_trees_wide_0.60_0.20_0.20_alpha.csv",
+    "rows": 8760,
+    "missing_predictions": 0,
+    "min_prediction": 2.9187148148148148,
+    "max_prediction": 21600.0,
+    "columns_match": true,
+    "ids_match": true,
+    "dt_match": true
+  },
+  "package_status": {
+    "main": {
+      "lightgbm": true,
+      "xgboost": true,
+      "catboost": true,
+      "sklearn": true,
+      "optuna": true,
+      "flaml": true,
+      "h2o": true,
+      "tabpfn": true,
+      "tabm": true,
+      "torch": true
+    },
+    "external_metadata_files": [
+      "metadata_autogluon.csv",
+      "metadata_main.csv",
+      "metadata_misc.csv",
+      "metadata_pycaret.csv"
+    ]
+  }
+}

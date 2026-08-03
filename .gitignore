@@ -1,3 +1,6 @@
 __pycache__/
 *.py[cod]
+*.log
+.venvs/
+experiments/expanded_model_search/artifacts/
 experiments/cv_protocol/official_eval_download/nuxt/
