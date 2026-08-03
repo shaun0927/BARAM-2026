@@ -40,6 +40,7 @@ Provisional T1/T6 candidate: full-history is supported for group 1/2, but needs 
 
 ## Caveats
 
-- FICR is a proxy because the official DACON code download was not available in this run.
+- The official page confirms the group FICR structure, but the exact per-hour settlement table remains in a DACON code-download attachment that was not accessible in this run.
+- FICR therefore uses a 6%/8% threshold proxy until the official code attachment is obtained.
 - Public/private LB calibration still needs actual submissions.
 - Group 3 has only 2023-2024 usable labels, so its train-window evidence is weaker.
