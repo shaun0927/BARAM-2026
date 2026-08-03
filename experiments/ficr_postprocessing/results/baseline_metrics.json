@@ -1,0 +1,14 @@
+{
+  "experiment_id": "baseline_w4",
+  "score": 0.6117673564727266,
+  "one_minus_nmae": 0.8700286771288893,
+  "avg_nmae": 0.12997132287111068,
+  "ficr": 0.3535060358165638,
+  "worst_month_score": 0.5917149198256562,
+  "high_generation_score": 0.6001969855349586,
+  "alphas": {
+    "kpx_group_1": 1.0,
+    "kpx_group_2": 1.0,
+    "kpx_group_3": 1.0
+  }
+}

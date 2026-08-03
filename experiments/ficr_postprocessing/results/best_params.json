@@ -1,0 +1,22 @@
+{
+  "best_by_score": {
+    "experiment_id": "A1_global_1.0275",
+    "method": "A1_global",
+    "verdict": "Strong accept",
+    "reason": "passes strong score/FiCR/nMAE/worst-month criteria",
+    "score": 0.6207259749431353,
+    "delta_score": 0.008958618470408686,
+    "one_minus_nmae": 0.8711552359099702,
+    "delta_one_minus_nmae": 0.0011265587810809219,
+    "ficr": 0.3702967139763003,
+    "delta_ficr": 0.016790678159736505,
+    "worst_month_score": 0.6030160002282019,
+    "delta_worst_month_score": 0.011301080402545738,
+    "alphas": {
+      "kpx_group_1": 1.0275,
+      "kpx_group_2": 1.0275,
+      "kpx_group_3": 1.0275
+    }
+  },
+  "phase_1_submission_candidate_created": true
+}
