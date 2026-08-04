@@ -1,0 +1,29 @@
+{
+  "row_target_rows": 26352,
+  "expected_rows": 26352,
+  "missing_values_core": {
+    "actual": 18,
+    "anchor_pred_raw": 0,
+    "anchor_pred_alpha": 0,
+    "normalized_abs_error": 18
+  },
+  "inf_values_core": {
+    "actual": 0,
+    "anchor_pred_raw": 0,
+    "anchor_pred_alpha": 0,
+    "normalized_abs_error": 0
+  },
+  "result_files": [
+    "anchor_reconstruction_check.json",
+    "bias_summary.csv",
+    "error_slice_summary.csv",
+    "ficr_failure_summary.csv",
+    "generation_bin_scores.csv",
+    "model_disagreement_summary.csv",
+    "next_audit_routing.md",
+    "quantile_ficr_pass_winner_summary.csv",
+    "quantile_win_loss_summary.csv",
+    "row_target_errors.parquet",
+    "sanity_check.json"
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "score": 0.6314912598569689,
+  "expected_score": 0.6314912599,
+  "score_abs_diff": 4.303113421144644e-11,
+  "ficr": 0.39081886246087655,
+  "expected_ficr": 0.3908188625,
+  "ficr_abs_diff": 3.912342672052205e-11,
+  "worst_month": 0.6038740233136989,
+  "expected_worst_month": 0.6038740233,
+  "worst_month_abs_diff": 1.3698930878547344e-11,
+  "high_generation_score": 0.6425350509381161,
+  "anchor_alpha": 1.03,
+  "anchor_weights": {
+    "catboost_quantile_0575_depth6": 0.7,
+    "catboost_quantile_060_depth6": 0.2,
+    "lgbm_l1_baseline": 0.1
+  },
+  "pass": true
+}
