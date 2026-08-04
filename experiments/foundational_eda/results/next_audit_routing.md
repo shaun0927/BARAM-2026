@@ -25,7 +25,12 @@ Open a focused `Data quality / cleansing audit` issue first, because a hard labe
 
 - `dataset_inventory.csv`
 - `timestamp_coverage.csv`
+- `weather_availability_inventory.csv`
+- `weather_schema_inventory.csv`
+- `weather_schema_consistency.csv`
+- `sample_horizon_alignment.csv`
 - `label_coverage.csv`
+- `target_temporal_extreme_summary.csv`
 - `target_distribution_summary.csv`
 - `target_ratio_bin_summary.csv`
 - `target_by_year_month_hour.csv`
@@ -35,6 +40,7 @@ Open a focused `Data quality / cleansing audit` issue first, because a hard labe
 - `ficr_boundary_distribution.csv`
 - `data_quality_inventory.csv`
 - `label_range_violations.csv`
+- `capacity_exceed_context.csv`
 - `feature_inventory.csv`
 - `feature_drift_summary.csv`
 - `feature_composition_summary.csv`

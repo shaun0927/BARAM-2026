@@ -1,0 +1,4 @@
+﻿source,rows,min_ts,max_ts,unique_timestamps,missing_hour_gaps,sample_timestamps_missing_from_source,source_timestamps_not_in_sample
+sample_submission,8760,2025-01-01 01:00:00,2026-01-01 00:00:00,8760,0,,
+ldaps_test,140160,2025-01-01 01:00:00,2026-01-01 00:00:00,8760,0,0.0,0.0
+gfs_test,78840,2025-01-01 01:00:00,2026-01-01 00:00:00,8760,0,0.0,0.0

@@ -1,5 +1,6 @@
 {
   "result_files": [
+    "capacity_exceed_context.csv",
     "data_quality_inventory.csv",
     "dataset_inventory.csv",
     "feature_composition_summary.csv",
@@ -13,13 +14,18 @@
     "metric_generation_bin_summary.csv",
     "next_audit_routing.md",
     "problem_framing.md",
+    "sample_horizon_alignment.csv",
     "sanity_check.json",
     "scada_inventory.csv",
     "target_by_year_month_hour.csv",
     "target_distribution_summary.csv",
     "target_group_correlation.csv",
     "target_ratio_bin_summary.csv",
-    "timestamp_coverage.csv"
+    "target_temporal_extreme_summary.csv",
+    "timestamp_coverage.csv",
+    "weather_availability_inventory.csv",
+    "weather_schema_consistency.csv",
+    "weather_schema_inventory.csv"
   ],
   "label_rows": 26304,
   "long_label_rows": 78912,

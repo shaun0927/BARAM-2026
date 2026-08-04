@@ -1,0 +1,5 @@
+﻿file,rows,unique_forecast_timestamps,forecast_min,forecast_max,missing_forecast_hours,unique_data_available_timestamps,data_available_min,data_available_max,min_lead_hours,p50_lead_hours,max_lead_hours,unique_lead_hours,min_grid_count_per_forecast,max_grid_count_per_forecast,mode_grid_count_per_forecast,forecasts_with_multiple_available_times,duplicate_forecast_grid_rows
+train/ldaps_train.csv,420864,26304,2022-01-01 01:00:00,2025-01-01 00:00:00,0,1096,2021-12-31 13:00:00,2024-12-30 13:00:00,12.0,23.5,35.0,24,16,16,16,0,0
+train/gfs_train.csv,236736,26304,2022-01-01 01:00:00,2025-01-01 00:00:00,0,1096,2021-12-31 13:00:00,2024-12-30 13:00:00,12.0,23.5,35.0,24,9,9,9,0,0
+test/ldaps_test.csv,140160,8760,2025-01-01 01:00:00,2026-01-01 00:00:00,0,365,2024-12-31 13:00:00,2025-12-30 13:00:00,12.0,23.5,35.0,24,16,16,16,0,0
+test/gfs_test.csv,78840,8760,2025-01-01 01:00:00,2026-01-01 00:00:00,0,365,2024-12-31 13:00:00,2025-12-30 13:00:00,12.0,23.5,35.0,24,9,9,9,0,0

@@ -553,6 +553,238 @@ def scada_meta_inventory(data_dir: Path) -> tuple[pd.DataFrame, pd.DataFrame]:
     return pd.DataFrame(scada_rows), pd.DataFrame(meta_rows)
 
 
+def weather_availability_inventory(data_dir: Path) -> pd.DataFrame:
+    rows = []
+    for rel in ["train/ldaps_train.csv", "train/gfs_train.csv", "test/ldaps_test.csv", "test/gfs_test.csv"]:
+        path = data_dir / rel
+        df = pd.read_csv(path, encoding="utf-8-sig", usecols=["forecast_kst_dtm", "data_available_kst_dtm", "grid_id"])
+        forecast = pd.to_datetime(df["forecast_kst_dtm"], errors="coerce")
+        available = pd.to_datetime(df["data_available_kst_dtm"], errors="coerce")
+        lead_hours = (forecast - available).dt.total_seconds() / 3600.0
+        per_forecast_grids = df.groupby("forecast_kst_dtm")["grid_id"].nunique()
+        per_forecast_available = df.groupby("forecast_kst_dtm")["data_available_kst_dtm"].nunique()
+        expected = pd.date_range(forecast.min(), forecast.max(), freq="h")
+        unique_forecast = pd.Index(forecast.dropna().unique()).sort_values()
+        rows.append(
+            {
+                "file": rel,
+                "rows": int(len(df)),
+                "unique_forecast_timestamps": int(forecast.nunique()),
+                "forecast_min": str(forecast.min()),
+                "forecast_max": str(forecast.max()),
+                "missing_forecast_hours": int(len(expected.difference(unique_forecast))),
+                "unique_data_available_timestamps": int(available.nunique()),
+                "data_available_min": str(available.min()),
+                "data_available_max": str(available.max()),
+                "min_lead_hours": float(lead_hours.min()),
+                "p50_lead_hours": float(lead_hours.median()),
+                "max_lead_hours": float(lead_hours.max()),
+                "unique_lead_hours": int(lead_hours.nunique()),
+                "min_grid_count_per_forecast": int(per_forecast_grids.min()),
+                "max_grid_count_per_forecast": int(per_forecast_grids.max()),
+                "mode_grid_count_per_forecast": int(per_forecast_grids.mode().iloc[0]),
+                "forecasts_with_multiple_available_times": int((per_forecast_available > 1).sum()),
+                "duplicate_forecast_grid_rows": int(df.duplicated(subset=["forecast_kst_dtm", "grid_id"]).sum()),
+            }
+        )
+    return pd.DataFrame(rows)
+
+
+def weather_schema_inventory(data_dir: Path) -> pd.DataFrame:
+    rows = []
+    for rel in ["train/ldaps_train.csv", "train/gfs_train.csv", "test/ldaps_test.csv", "test/gfs_test.csv"]:
+        path = data_dir / rel
+        df = pd.read_csv(path, encoding="utf-8-sig")
+        numeric_cols = df.select_dtypes(include=[np.number]).columns.tolist()
+        for col in df.columns:
+            s = df[col]
+            row = {
+                "file": rel,
+                "column": col,
+                "dtype": str(s.dtype),
+                "missing_rate": float(s.isna().mean()),
+                "unique_count": int(s.nunique(dropna=True)),
+                "is_numeric": bool(col in numeric_cols),
+                "min": np.nan,
+                "max": np.nan,
+                "mean": np.nan,
+                "std": np.nan,
+                "nonfinite_count": np.nan,
+            }
+            if col in numeric_cols:
+                ns = pd.to_numeric(s, errors="coerce")
+                row.update(
+                    {
+                        "min": float(ns.min()),
+                        "max": float(ns.max()),
+                        "mean": float(ns.mean()),
+                        "std": float(ns.std()),
+                        "nonfinite_count": int((~np.isfinite(ns.to_numpy())).sum()),
+                    }
+                )
+            rows.append(row)
+    return pd.DataFrame(rows)
+
+
+def weather_schema_consistency(data_dir: Path) -> pd.DataFrame:
+    rows = []
+    for source in ["ldaps", "gfs"]:
+        train_cols = pd.read_csv(data_dir / "train" / f"{source}_train.csv", encoding="utf-8-sig", nrows=1).columns.tolist()
+        test_cols = pd.read_csv(data_dir / "test" / f"{source}_test.csv", encoding="utf-8-sig", nrows=1).columns.tolist()
+        rows.append(
+            {
+                "source": source,
+                "train_column_count": len(train_cols),
+                "test_column_count": len(test_cols),
+                "same_ordered_columns": train_cols == test_cols,
+                "train_only_columns": ",".join(sorted(set(train_cols) - set(test_cols))),
+                "test_only_columns": ",".join(sorted(set(test_cols) - set(train_cols))),
+            }
+        )
+    return pd.DataFrame(rows)
+
+
+def sample_horizon_alignment(data_dir: Path) -> pd.DataFrame:
+    sample = pd.read_csv(data_dir / "sample_submission.csv", encoding="utf-8-sig")
+    sample_ts = pd.to_datetime(sample["forecast_kst_dtm"], errors="coerce")
+    rows = [
+        {
+            "source": "sample_submission",
+            "rows": int(len(sample)),
+            "min_ts": str(sample_ts.min()),
+            "max_ts": str(sample_ts.max()),
+            "unique_timestamps": int(sample_ts.nunique()),
+            "missing_hour_gaps": int(len(pd.date_range(sample_ts.min(), sample_ts.max(), freq="h").difference(pd.Index(sample_ts.dropna().unique()).sort_values()))),
+        }
+    ]
+    for source in ["ldaps", "gfs"]:
+        df = pd.read_csv(data_dir / "test" / f"{source}_test.csv", encoding="utf-8-sig", usecols=["forecast_kst_dtm"])
+        ts = pd.to_datetime(df["forecast_kst_dtm"], errors="coerce")
+        unique_ts = pd.Index(ts.dropna().unique()).sort_values()
+        rows.append(
+            {
+                "source": f"{source}_test",
+                "rows": int(len(df)),
+                "min_ts": str(ts.min()),
+                "max_ts": str(ts.max()),
+                "unique_timestamps": int(ts.nunique()),
+                "missing_hour_gaps": int(len(pd.date_range(ts.min(), ts.max(), freq="h").difference(unique_ts))),
+                "sample_timestamps_missing_from_source": int(len(pd.Index(sample_ts.dropna().unique()).difference(unique_ts))),
+                "source_timestamps_not_in_sample": int(len(unique_ts.difference(pd.Index(sample_ts.dropna().unique())))),
+            }
+        )
+    return pd.DataFrame(rows)
+
+
+def target_temporal_extreme_summary(labels: pd.DataFrame, long: pd.DataFrame) -> pd.DataFrame:
+    rows = []
+    for target in TARGETS:
+        s = labels[["kst_dtm", "year", "month", "hour", target]].copy()
+        s["actual_ratio"] = s[target] / CAPACITY[target]
+        nonnull = s[s[target].notna()]
+        eligible = nonnull[nonnull["actual_ratio"] >= 0.10]
+        rows.append(
+            {
+                "target": target,
+                "scope": "all_nonnull",
+                "rows": int(len(nonnull)),
+                "mean_ratio": float(nonnull["actual_ratio"].mean()),
+                "std_ratio": float(nonnull["actual_ratio"].std()),
+                "zero_rate": float((nonnull[target] == 0).mean()),
+                "near_zero_rate_lt_1pct": float((nonnull["actual_ratio"] < 0.01).mean()),
+                "eligible_rate": float((nonnull["actual_ratio"] >= 0.10).mean()),
+                "high_generation_rate_ge_80pct": float((nonnull["actual_ratio"] >= 0.80).mean()),
+                "capacity_exceed_count": int((nonnull["actual_ratio"] > 1.0).sum()),
+                "max_zero_run_hours": int(max_zero_run(s[target])),
+                "max_ratio": float(nonnull["actual_ratio"].max()),
+            }
+        )
+        for year, part in nonnull.groupby("year"):
+            rows.append(
+                {
+                    "target": target,
+                    "scope": f"year_{int(year)}",
+                    "rows": int(len(part)),
+                    "mean_ratio": float(part["actual_ratio"].mean()),
+                    "std_ratio": float(part["actual_ratio"].std()),
+                    "zero_rate": float((part[target] == 0).mean()),
+                    "near_zero_rate_lt_1pct": float((part["actual_ratio"] < 0.01).mean()),
+                    "eligible_rate": float((part["actual_ratio"] >= 0.10).mean()),
+                    "high_generation_rate_ge_80pct": float((part["actual_ratio"] >= 0.80).mean()),
+                    "capacity_exceed_count": int((part["actual_ratio"] > 1.0).sum()),
+                    "max_zero_run_hours": int(max_zero_run(part[target])),
+                    "max_ratio": float(part["actual_ratio"].max()),
+                }
+            )
+        hourly = eligible.groupby("hour")["actual_ratio"].mean()
+        monthly = eligible.groupby("month")["actual_ratio"].mean()
+        if len(hourly):
+            rows.append(
+                {
+                    "target": target,
+                    "scope": "eligible_hourly_range",
+                    "rows": int(len(eligible)),
+                    "mean_ratio": float(eligible["actual_ratio"].mean()),
+                    "std_ratio": float(eligible["actual_ratio"].std()),
+                    "eligible_rate": np.nan,
+                    "high_generation_rate_ge_80pct": float((eligible["actual_ratio"] >= 0.80).mean()),
+                    "capacity_exceed_count": int((eligible["actual_ratio"] > 1.0).sum()),
+                    "max_zero_run_hours": np.nan,
+                    "max_ratio": float(eligible["actual_ratio"].max()),
+                    "best_hour": int(hourly.idxmax()),
+                    "worst_hour": int(hourly.idxmin()),
+                    "hourly_mean_ratio_range": float(hourly.max() - hourly.min()),
+                }
+            )
+        if len(monthly):
+            rows.append(
+                {
+                    "target": target,
+                    "scope": "eligible_monthly_range",
+                    "rows": int(len(eligible)),
+                    "mean_ratio": float(eligible["actual_ratio"].mean()),
+                    "std_ratio": float(eligible["actual_ratio"].std()),
+                    "eligible_rate": np.nan,
+                    "high_generation_rate_ge_80pct": float((eligible["actual_ratio"] >= 0.80).mean()),
+                    "capacity_exceed_count": int((eligible["actual_ratio"] > 1.0).sum()),
+                    "max_zero_run_hours": np.nan,
+                    "max_ratio": float(eligible["actual_ratio"].max()),
+                    "best_month": int(monthly.idxmax()),
+                    "worst_month": int(monthly.idxmin()),
+                    "monthly_mean_ratio_range": float(monthly.max() - monthly.min()),
+                }
+            )
+    return pd.DataFrame(rows)
+
+
+def capacity_exceed_context(labels: pd.DataFrame) -> pd.DataFrame:
+    rows = []
+    for target in TARGETS:
+        cap = CAPACITY[target]
+        df = labels[["kst_dtm", "year", "month", "hour", target]].copy()
+        df["actual_ratio"] = df[target] / cap
+        exceed = df[df["actual_ratio"] > 1.0].copy()
+        for _, row in exceed.iterrows():
+            same_month_hour = df[(df["year"] == row["year"]) & (df["month"] == row["month"]) & (df["hour"] == row["hour"]) & df[target].notna()]
+            rows.append(
+                {
+                    "kst_dtm": row["kst_dtm"],
+                    "target": target,
+                    "year": int(row["year"]),
+                    "month": int(row["month"]),
+                    "hour": int(row["hour"]),
+                    "actual": float(row[target]),
+                    "capacity": float(cap),
+                    "actual_ratio": float(row["actual_ratio"]),
+                    "excess_kwh": float(row[target] - cap),
+                    "same_year_month_hour_count": int(len(same_month_hour)),
+                    "same_year_month_hour_p95_ratio": float(same_month_hour["actual_ratio"].quantile(0.95)) if len(same_month_hour) else np.nan,
+                    "same_year_month_hour_max_ratio": float(same_month_hour["actual_ratio"].max()) if len(same_month_hour) else np.nan,
+                }
+            )
+    return pd.DataFrame(rows)
+
+
 def write_reports(results: Path, tables: dict[str, pd.DataFrame]) -> None:
     label_cov = tables["label_coverage"]
     ratio = tables["target_ratio_bin_summary"]
@@ -564,6 +796,11 @@ def write_reports(results: Path, tables: dict[str, pd.DataFrame]) -> None:
     feature_comp = tables.get("feature_composition_summary", pd.DataFrame())
     scada_inventory = tables.get("scada_inventory", pd.DataFrame())
     meta_inventory = tables.get("meta_inventory", pd.DataFrame())
+    weather_availability = tables.get("weather_availability_inventory", pd.DataFrame())
+    weather_schema_cons = tables.get("weather_schema_consistency", pd.DataFrame())
+    target_extreme = tables.get("target_temporal_extreme_summary", pd.DataFrame())
+    capacity_context = tables.get("capacity_exceed_context", pd.DataFrame())
+    sample_alignment = tables.get("sample_horizon_alignment", pd.DataFrame())
 
     def md_table(df: pd.DataFrame, n: int = 20) -> str:
         return df.head(n).to_markdown(index=False)
@@ -617,10 +854,13 @@ def write_reports(results: Path, tables: dict[str, pd.DataFrame]) -> None:
         high_tt_ks = int(feature_drift["train_test_ks"].gt(0.30).sum())
         high_tv_psi = int(feature_drift["train_valid_psi"].gt(0.25).sum())
         high_tt_psi = int(feature_drift["train_test_psi"].gt(0.25).sum())
+        non_time = feature_drift[feature_drift["source"].ne("time")]
+        high_tv_ks_non_time = int(non_time["train_valid_ks"].gt(0.30).sum())
+        high_tt_ks_non_time = int(non_time["train_test_ks"].gt(0.30).sum())
         drift_fact_lines.extend(
             [
-                f"- features with train-valid KS > 0.30: {high_tv_ks}",
-                f"- features with train-test KS > 0.30: {high_tt_ks}",
+                f"- features with train-valid KS > 0.30: {high_tv_ks} total, {high_tv_ks_non_time} excluding time features",
+                f"- features with train-test KS > 0.30: {high_tt_ks} total, {high_tt_ks_non_time} excluding time features",
                 f"- features with train-valid PSI > 0.25: {high_tv_psi}",
                 f"- features with train-test PSI > 0.25: {high_tt_psi}",
             ]
@@ -631,6 +871,38 @@ def write_reports(results: Path, tables: dict[str, pd.DataFrame]) -> None:
         info_rows = meta_inventory[meta_inventory["metric"].eq("rows")]
         if not info_rows.empty:
             drift_fact_lines.append(f"- info.xlsx turbine/meta rows: {int(info_rows.iloc[0]['value'])}")
+
+    weather_lines = []
+    if not weather_availability.empty:
+        min_lead = weather_availability["min_lead_hours"].min()
+        max_lead = weather_availability["max_lead_hours"].max()
+        multi_avail = int(weather_availability["forecasts_with_multiple_available_times"].sum())
+        dup_weather = int(weather_availability["duplicate_forecast_grid_rows"].sum())
+        weather_lines.extend(
+            [
+                f"- forecast lead-hour range across weather files: {min_lead:.1f} to {max_lead:.1f}",
+                f"- forecasts with multiple data_available timestamps: {multi_avail}",
+                f"- duplicate forecast/grid rows: {dup_weather}",
+            ]
+        )
+    if not weather_schema_cons.empty:
+        same_schema = bool(weather_schema_cons["same_ordered_columns"].all())
+        weather_lines.append(f"- train/test weather schemas have identical ordered columns: {same_schema}")
+    if not sample_alignment.empty:
+        missing_from_sources = sample_alignment.filter(like="sample_timestamps_missing_from_source").sum(numeric_only=True).sum()
+        weather_lines.append(f"- sample timestamps missing from test weather sources: {int(missing_from_sources)}")
+
+    target_extreme_lines = []
+    if not target_extreme.empty:
+        all_rows = target_extreme[target_extreme["scope"].eq("all_nonnull")]
+        for _, row in all_rows.iterrows():
+            target_extreme_lines.append(
+                f"- {row['target']}: eligible_rate {row['eligible_rate']:.4f}, zero_rate {row['zero_rate']:.4f}, high>=80% rate {row['high_generation_rate_ge_80pct']:.4f}, max_zero_run_hours {int(row['max_zero_run_hours'])}, max_ratio {row['max_ratio']:.4f}"
+            )
+    if not capacity_context.empty:
+        max_excess = float(capacity_context["excess_kwh"].max())
+        max_ratio = float(capacity_context["actual_ratio"].max())
+        target_extreme_lines.append(f"- capacity-exceed details: {len(capacity_context)} rows, max excess {max_excess:.3f} kWh, max ratio {max_ratio:.6f}")
 
     route = "temporal drift and feature inventory audit"
     reason = "Target means and eligible distribution vary materially by year/month/hour; B1 feature coverage is mostly stable, so the next non-modeling uncertainty is target/temporal structure unless data-quality blockers take precedence."
@@ -662,9 +934,37 @@ def write_reports(results: Path, tables: dict[str, pd.DataFrame]) -> None:
         "",
         md_table(tables["dataset_inventory"]),
         "",
+        "## Forecast availability and raw weather consistency",
+        "",
+        "\n".join(weather_lines) if weather_lines else "Weather availability inventory was not available.",
+        "",
+        "### Weather availability",
+        "",
+        md_table(weather_availability) if not weather_availability.empty else "No weather availability table.",
+        "",
+        "### Weather schema consistency",
+        "",
+        md_table(weather_schema_cons) if not weather_schema_cons.empty else "No weather schema consistency table.",
+        "",
+        "### Sample/test horizon alignment",
+        "",
+        md_table(sample_alignment) if not sample_alignment.empty else "No sample horizon alignment table.",
+        "",
         "## Label coverage",
         "",
         md_table(label_cov),
+        "",
+        "## Target temporal/extreme structure",
+        "",
+        "\n".join(target_extreme_lines) if target_extreme_lines else "No target temporal/extreme table.",
+        "",
+        "### Target temporal/extreme summary",
+        "",
+        md_table(target_extreme, 30) if not target_extreme.empty else "No target temporal/extreme table.",
+        "",
+        "### Capacity exceed context",
+        "",
+        md_table(capacity_context, 20) if not capacity_context.empty else "No capacity exceed context rows.",
         "",
         "## Eligible generation-bin structure",
         "",
@@ -703,6 +1003,8 @@ def write_reports(results: Path, tables: dict[str, pd.DataFrame]) -> None:
         "- The official metric excludes actual/capacity below 10%, so near-zero rows are primarily a training/data-behavior concern, not direct official-score mass.",
         "- The eligible set is dominated by 10~80% ratio bins by count, while high-ratio bins carry high actual mass and stricter underprediction risk.",
         "- Group/year coverage differs structurally because group3 has missing labels in 2022 by competition design.",
+        "- Raw weather availability and train/test schema are structurally usable for a fixed B1 feature baseline, but this does not prove feature sufficiency.",
+        "- B1 aggregate feature drift appears mild after excluding the deterministic `year` feature; this weakens the case for more model-only search as the next step.",
         "- The correct next action is a focused audit issue, not another broad modeling run. The focused route must be selected from hard data-quality blockers, target/temporal shift, and B1 feature coverage/drift.",
     ]
     (results / "problem_framing.md").write_text("\n".join(problem), encoding="utf-8")
@@ -735,7 +1037,12 @@ def write_reports(results: Path, tables: dict[str, pd.DataFrame]) -> None:
         "",
         "- `dataset_inventory.csv`",
         "- `timestamp_coverage.csv`",
+        "- `weather_availability_inventory.csv`",
+        "- `weather_schema_inventory.csv`",
+        "- `weather_schema_consistency.csv`",
+        "- `sample_horizon_alignment.csv`",
         "- `label_coverage.csv`",
+        "- `target_temporal_extreme_summary.csv`",
         "- `target_distribution_summary.csv`",
         "- `target_ratio_bin_summary.csv`",
         "- `target_by_year_month_hour.csv`",
@@ -745,6 +1052,7 @@ def write_reports(results: Path, tables: dict[str, pd.DataFrame]) -> None:
         "- `ficr_boundary_distribution.csv`",
         "- `data_quality_inventory.csv`",
         "- `label_range_violations.csv`",
+        "- `capacity_exceed_context.csv`",
         "- `feature_inventory.csv`",
         "- `feature_drift_summary.csv`",
         "- `feature_composition_summary.csv`",
@@ -763,11 +1071,20 @@ def main() -> None:
     long = make_long_labels(labels)
     feature_inventory, feature_drift, feature_comp = feature_inventory_and_drift(args.data_dir)
     scada_inventory, meta_inventory = scada_meta_inventory(args.data_dir)
+    weather_availability = weather_availability_inventory(args.data_dir)
+    weather_schema = weather_schema_inventory(args.data_dir)
+    weather_schema_cons = weather_schema_consistency(args.data_dir)
+    sample_alignment = sample_horizon_alignment(args.data_dir)
 
     tables = {
         "dataset_inventory": inv,
         "timestamp_coverage": ts_cov,
+        "weather_availability_inventory": weather_availability,
+        "weather_schema_inventory": weather_schema,
+        "weather_schema_consistency": weather_schema_cons,
+        "sample_horizon_alignment": sample_alignment,
         "label_coverage": label_coverage(long),
+        "target_temporal_extreme_summary": target_temporal_extreme_summary(labels, long),
         "target_distribution_summary": target_distribution(long),
         "target_ratio_bin_summary": target_ratio_bins(long),
         "target_by_year_month_hour": target_by_year_month_hour(long),
@@ -777,6 +1094,7 @@ def main() -> None:
         "ficr_boundary_distribution": ficr_boundary_distribution(long),
         "data_quality_inventory": data_quality_inventory(args.data_dir, labels, long),
         "label_range_violations": label_range_violations(labels),
+        "capacity_exceed_context": capacity_exceed_context(labels),
         "feature_inventory": feature_inventory,
         "feature_drift_summary": feature_drift,
         "feature_composition_summary": feature_comp,
