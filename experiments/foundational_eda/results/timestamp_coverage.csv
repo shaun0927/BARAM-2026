@@ -1,0 +1,13 @@
+﻿time_col,min_ts,max_ts,unique_timestamps,expected_hourly_timestamps,missing_hour_gaps,duplicate_timestamp_rows,non_1h_gap_count,file,min_grid_count_per_timestamp,max_grid_count_per_timestamp,mode_grid_count_per_timestamp
+kst_dtm,2022-01-01 01:00:00,2025-01-01 00:00:00,26304,26304,0,0,0,train\train_labels.csv,,,
+forecast_kst_dtm,2022-01-01 01:00:00,2025-01-01 00:00:00,26304,26304,0,394560,0,train\ldaps_train.csv,16.0,16.0,16.0
+data_available_kst_dtm,2021-12-31 13:00:00,2024-12-30 13:00:00,1096,26281,25185,419768,1095,train\ldaps_train.csv,,,
+forecast_kst_dtm,2022-01-01 01:00:00,2025-01-01 00:00:00,26304,26304,0,210432,0,train\gfs_train.csv,9.0,9.0,9.0
+data_available_kst_dtm,2021-12-31 13:00:00,2024-12-30 13:00:00,1096,26281,25185,235640,1095,train\gfs_train.csv,,,
+kst_dtm,2023-01-01 00:10:00,2025-01-01 00:00:00,105264,17544,0,0,105263,train\scada_unison_train.csv,,,
+kst_dtm,2022-01-01 01:00:00,2025-01-01 00:00:00,157819,26304,0,0,157818,train\scada_vestas_train.csv,,,
+forecast_kst_dtm,2025-01-01 01:00:00,2026-01-01 00:00:00,8760,8760,0,131400,0,test\ldaps_test.csv,16.0,16.0,16.0
+data_available_kst_dtm,2024-12-31 13:00:00,2025-12-30 13:00:00,365,8737,8372,139795,364,test\ldaps_test.csv,,,
+forecast_kst_dtm,2025-01-01 01:00:00,2026-01-01 00:00:00,8760,8760,0,70080,0,test\gfs_test.csv,9.0,9.0,9.0
+data_available_kst_dtm,2024-12-31 13:00:00,2025-12-30 13:00:00,365,8737,8372,78475,364,test\gfs_test.csv,,,
+forecast_kst_dtm,2025-01-01 01:00:00,2026-01-01 00:00:00,8760,8760,0,0,0,sample_submission.csv,,,

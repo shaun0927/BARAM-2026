@@ -1,0 +1,22 @@
+{
+  "result_files": [
+    "data_quality_inventory.csv",
+    "dataset_inventory.csv",
+    "ficr_boundary_distribution.csv",
+    "label_coverage.csv",
+    "label_range_violations.csv",
+    "metric_eligible_distribution.csv",
+    "metric_generation_bin_summary.csv",
+    "next_audit_routing.md",
+    "problem_framing.md",
+    "sanity_check.json",
+    "target_by_year_month_hour.csv",
+    "target_distribution_summary.csv",
+    "target_group_correlation.csv",
+    "target_ratio_bin_summary.csv",
+    "timestamp_coverage.csv"
+  ],
+  "label_rows": 26304,
+  "long_label_rows": 78912,
+  "expected_long_label_rows": 78912
+}

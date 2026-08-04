@@ -1,0 +1,11 @@
+﻿file,exists,bytes,rows,columns,datetime_columns,numeric_columns,object_columns
+train\train_labels.csv,True,1138967,26304.0,4.0,kst_dtm,3.0,0.0
+train\ldaps_train.csv,True,129687357,420864.0,35.0,"forecast_kst_dtm,data_available_kst_dtm",33.0,0.0
+train\gfs_train.csv,True,84315594,236736.0,40.0,"forecast_kst_dtm,data_available_kst_dtm",38.0,0.0
+train\scada_unison_train.csv,True,16788646,105264.0,16.0,kst_dtm,15.0,0.0
+train\scada_vestas_train.csv,True,33458140,157819.0,37.0,kst_dtm,36.0,0.0
+test\ldaps_test.csv,True,43122637,140160.0,35.0,"forecast_kst_dtm,data_available_kst_dtm",33.0,0.0
+test\gfs_test.csv,True,28037722,78840.0,40.0,"forecast_kst_dtm,data_available_kst_dtm",38.0,0.0
+sample_submission.csv,True,359229,8760.0,5.0,forecast_kst_dtm,3.0,0.0
+data_description.md,True,11694,,,,,
+info.xlsx,True,3823422,20.0,12.0,sheets=info,,

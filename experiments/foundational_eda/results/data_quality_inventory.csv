@@ -1,0 +1,8 @@
+﻿scope,name,rows,missing,negative,zero,capacity_exceed,max_zero_run_hours,min_value,max_value,duplicate_forecast_grid_rows
+label,kpx_group_1,26304,104,0.0,3001.0,0.0,169.0,0.0,21275.305,
+label,kpx_group_2,26304,103,0.0,2992.0,0.0,161.0,0.0,21362.084,
+label,kpx_group_3,26304,8766,0.0,2846.0,38.0,142.0,0.0,21130.674,
+weather,train/ldaps_train.csv,420864,0,,,,,-179.58722,103395.07,0.0
+weather,train/gfs_train.csv,236736,0,,,,,-40.966904,103858.49,0.0
+weather,test/ldaps_test.csv,140160,752,,,,,-163.02718,103203.39,0.0
+weather,test/gfs_test.csv,78840,0,,,,,-36.321423,103296.336,0.0
