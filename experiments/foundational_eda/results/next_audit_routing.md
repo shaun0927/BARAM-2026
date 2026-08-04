@@ -1,7 +1,7 @@
 # Next Audit Routing
 
 - recommended next issue: **data quality / cleansing audit**
-- evidence: Range violations exist in labels and must be explained before modeling changes.
+- evidence: Capacity-exceed label values exist and must be explained before any cleansing rule, model HPO, or feature expansion.
 - priority: high
 - what not to do yet: do not resume CatBoost HPO, do not apply cleansing, and do not add feature families until the next focused audit explains whether the issue is drift, feature coverage, or data quality.
 
@@ -12,13 +12,14 @@
 
 ## Recommended next issue scope
 
-If no hard data-quality blocker is present, open a focused `Temporal drift and feature inventory audit` issue:
+Open a focused `Data quality / cleansing audit` issue first, because a hard label-range blocker is present:
 
-- compare train years 2022/2023 vs validation 2024 target distributions by group/month/hour/bin
-- inspect B1 feature inventory and train-valid/test feature coverage
-- quantify feature drift and missingness drift
-- connect drift/feature coverage to the generation regimes identified here
-- do not train new models until this audit routes an intervention
+- enumerate all capacity-exceed rows and their timestamp/target/month/hour/regime
+- verify whether exceedance is true production, capacity metadata mismatch, rounding/noise, aggregation issue, or label anomaly
+- test candidate cleansing rules diagnostically only: clip-to-capacity, remove rows, keep-as-is, target-specific rule
+- replay historical validation without adding features or HPO to measure whether each rule changes metric-facing behavior
+- decide one explicit policy: no cleansing, clipping, exclusion, or metadata correction
+- only after this is resolved, move to temporal drift / feature sufficiency audit
 
 ## Supporting tables
 
@@ -34,3 +35,8 @@ If no hard data-quality blocker is present, open a focused `Temporal drift and f
 - `ficr_boundary_distribution.csv`
 - `data_quality_inventory.csv`
 - `label_range_violations.csv`
+- `feature_inventory.csv`
+- `feature_drift_summary.csv`
+- `feature_composition_summary.csv`
+- `scada_inventory.csv`
+- `meta_inventory.csv`

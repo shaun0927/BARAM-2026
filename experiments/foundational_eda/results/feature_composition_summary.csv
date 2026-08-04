@@ -1,0 +1,10 @@
+﻿source,stat,feature_count,mean_train_missing,mean_valid_missing,mean_test_missing,near_constant_count
+gfs,max,37,0.0,0.0,0.0,2
+gfs,mean,37,0.0,0.0,0.0,2
+gfs,min,37,0.0,0.0,0.0,2
+gfs,std,37,0.0,0.0,0.0,2
+ldaps,max,32,0.0,0.0,0.000167684667199452,4
+ldaps,mean,32,0.0,0.0,0.000167684667199452,4
+ldaps,min,32,0.0,0.0,0.000167684667199452,4
+ldaps,std,32,0.0,0.0,0.000167684667199452,4
+time,time,10,0.0,0.0,0.0,0

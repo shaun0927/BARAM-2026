@@ -13,6 +13,7 @@ ROOT = Path(__file__).resolve().parents[2]
 CV_DIR = ROOT / "experiments" / "cv_protocol"
 sys.path.insert(0, str(CV_DIR))
 
+from generate_submission_candidates import build_train_test_features  # noqa: E402
 from run_cv_protocol import CAPACITY, TARGETS, build_feature_frame, read_labels  # noqa: E402
 
 
@@ -378,12 +379,191 @@ def label_range_violations(labels: pd.DataFrame) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
+def feature_source(col: str) -> str:
+    if col.startswith("ldaps_"):
+        return "ldaps"
+    if col.startswith("gfs_"):
+        return "gfs"
+    if col in {"year", "month", "hour", "dayofyear", "month_sin", "month_cos", "hour_sin", "hour_cos", "doy_sin", "doy_cos"}:
+        return "time"
+    return "other"
+
+
+def feature_stat(col: str) -> str:
+    for suffix in ["_mean", "_min", "_max", "_std"]:
+        if col.endswith(suffix):
+            return suffix[1:]
+    if feature_source(col) == "time":
+        return "time"
+    return "raw"
+
+
+def ks_stat(a: pd.Series, b: pd.Series) -> float:
+    a = pd.to_numeric(a, errors="coerce").dropna().to_numpy()
+    b = pd.to_numeric(b, errors="coerce").dropna().to_numpy()
+    if len(a) == 0 or len(b) == 0:
+        return np.nan
+    try:
+        from scipy.stats import ks_2samp
+
+        return float(ks_2samp(a, b).statistic)
+    except Exception:
+        grid = np.unique(np.concatenate([a, b]))
+        if len(grid) == 0:
+            return np.nan
+        return float(np.max(np.abs(np.searchsorted(np.sort(a), grid, side="right") / len(a) - np.searchsorted(np.sort(b), grid, side="right") / len(b))))
+
+
+def psi_stat(expected: pd.Series, actual: pd.Series, bins: int = 10) -> float:
+    e = pd.to_numeric(expected, errors="coerce").dropna().to_numpy()
+    a = pd.to_numeric(actual, errors="coerce").dropna().to_numpy()
+    if len(e) == 0 or len(a) == 0:
+        return np.nan
+    qs = np.unique(np.quantile(e, np.linspace(0, 1, bins + 1)))
+    if len(qs) <= 2:
+        return 0.0
+    e_counts, _ = np.histogram(e, bins=qs)
+    a_counts, _ = np.histogram(a, bins=qs)
+    e_pct = np.maximum(e_counts / max(e_counts.sum(), 1), 1e-6)
+    a_pct = np.maximum(a_counts / max(a_counts.sum(), 1), 1e-6)
+    return float(np.sum((a_pct - e_pct) * np.log(a_pct / e_pct)))
+
+
+def feature_inventory_and_drift(data_dir: Path) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    train_features, test_features = build_train_test_features(data_dir)
+    train_22_23 = train_features[train_features["year"].isin([2022, 2023])].reset_index(drop=True)
+    valid_2024 = train_features[train_features["year"].eq(2024)].reset_index(drop=True)
+    test_2025 = test_features[test_features["year"].eq(2025)].reset_index(drop=True)
+    feature_cols = [c for c in train_features.columns if c != "forecast_kst_dtm"]
+
+    inv_rows = []
+    drift_rows = []
+    for col in feature_cols:
+        train_s = train_22_23[col]
+        valid_s = valid_2024[col]
+        test_s = test_2025[col] if col in test_2025.columns else pd.Series(dtype=float)
+        all_s = train_features[col]
+        inv_rows.append(
+            {
+                "feature": col,
+                "source": feature_source(col),
+                "stat": feature_stat(col),
+                "train_missing_rate": float(train_s.isna().mean()),
+                "valid_missing_rate": float(valid_s.isna().mean()),
+                "test_missing_rate": float(test_s.isna().mean()) if len(test_s) else np.nan,
+                "train_unique": int(train_s.nunique(dropna=True)),
+                "valid_unique": int(valid_s.nunique(dropna=True)),
+                "test_unique": int(test_s.nunique(dropna=True)) if len(test_s) else np.nan,
+                "near_constant": bool(all_s.nunique(dropna=True) <= 1),
+                "train_mean": float(pd.to_numeric(train_s, errors="coerce").mean()),
+                "valid_mean": float(pd.to_numeric(valid_s, errors="coerce").mean()),
+                "test_mean": float(pd.to_numeric(test_s, errors="coerce").mean()) if len(test_s) else np.nan,
+                "train_std": float(pd.to_numeric(train_s, errors="coerce").std()),
+                "valid_std": float(pd.to_numeric(valid_s, errors="coerce").std()),
+                "test_std": float(pd.to_numeric(test_s, errors="coerce").std()) if len(test_s) else np.nan,
+            }
+        )
+        drift_rows.append(
+            {
+                "feature": col,
+                "source": feature_source(col),
+                "stat": feature_stat(col),
+                "train_valid_ks": ks_stat(train_s, valid_s),
+                "train_test_ks": ks_stat(train_s, test_s) if len(test_s) else np.nan,
+                "valid_test_ks": ks_stat(valid_s, test_s) if len(test_s) else np.nan,
+                "train_valid_psi": psi_stat(train_s, valid_s),
+                "train_test_psi": psi_stat(train_s, test_s) if len(test_s) else np.nan,
+                "valid_test_psi": psi_stat(valid_s, test_s) if len(test_s) else np.nan,
+                "valid_mean_delta": float(pd.to_numeric(valid_s, errors="coerce").mean() - pd.to_numeric(train_s, errors="coerce").mean()),
+                "test_mean_delta_vs_train": float(pd.to_numeric(test_s, errors="coerce").mean() - pd.to_numeric(train_s, errors="coerce").mean()) if len(test_s) else np.nan,
+            }
+        )
+    inv = pd.DataFrame(inv_rows)
+    drift = pd.DataFrame(drift_rows).sort_values(["train_valid_ks", "train_test_ks"], ascending=False)
+    comp = (
+        inv.groupby(["source", "stat"], dropna=False)
+        .agg(
+            feature_count=("feature", "size"),
+            mean_train_missing=("train_missing_rate", "mean"),
+            mean_valid_missing=("valid_missing_rate", "mean"),
+            mean_test_missing=("test_missing_rate", "mean"),
+            near_constant_count=("near_constant", "sum"),
+        )
+        .reset_index()
+    )
+    return inv, drift, comp
+
+
+def scada_meta_inventory(data_dir: Path) -> tuple[pd.DataFrame, pd.DataFrame]:
+    scada_rows = []
+    for rel in ["train/scada_unison_train.csv", "train/scada_vestas_train.csv"]:
+        path = data_dir / rel
+        df = pd.read_csv(path, encoding="utf-8-sig")
+        ts = pd.to_datetime(df["kst_dtm"], errors="coerce").sort_values()
+        diffs = ts.drop_duplicates().diff().dropna()
+        mode_gap = diffs.mode().iloc[0] if not diffs.empty else pd.NaT
+        scada_rows.append(
+            {
+                "file": rel,
+                "rows": int(len(df)),
+                "columns": int(df.shape[1]),
+                "min_ts": str(ts.min()),
+                "max_ts": str(ts.max()),
+                "unique_timestamps": int(ts.nunique()),
+                "mode_timestamp_gap": str(mode_gap),
+                "missing_values": int(df.isna().sum().sum()),
+                "numeric_columns": int(len(df.select_dtypes(include=[np.number]).columns)),
+            }
+        )
+    meta_rows = []
+    info_path = data_dir / "info.xlsx"
+    if info_path.exists():
+        raw_info = pd.read_excel(info_path, sheet_name="info", header=None).dropna(how="all")
+        header_idx = None
+        for idx, row in raw_info.iterrows():
+            if row.astype(str).str.contains("KPX그룹", na=False).any():
+                header_idx = idx
+                break
+        if header_idx is not None:
+            info = raw_info.loc[header_idx + 1 :].copy()
+            info.columns = raw_info.loc[header_idx].fillna("").astype(str).str.strip().tolist()
+            info = info.drop(columns=[c for c in info.columns if c == ""], errors="ignore").dropna(how="all")
+        else:
+            info = raw_info.copy()
+        meta_rows.append({"metric": "rows", "value": int(len(info))})
+        meta_rows.append({"metric": "columns", "value": int(info.shape[1])})
+        if "KPX그룹" in info.columns:
+            info["_KPX그룹_ffill"] = info["KPX그룹"].ffill()
+        for col in ["KPX그룹", "제작사", "모델명"]:
+            if col in info.columns:
+                counts = info[col].value_counts(dropna=False)
+                for key, value in counts.items():
+                    meta_rows.append({"metric": f"{col}_count", "key": str(key), "value": int(value)})
+        if "_KPX그룹_ffill" in info.columns:
+            counts = info["_KPX그룹_ffill"].value_counts(dropna=False)
+            for key, value in counts.items():
+                meta_rows.append({"metric": "KPX그룹_ffill_count", "key": str(key), "value": int(value)})
+        if "KPX그룹" in info.columns and "설비용량(MW)" in info.columns:
+            group_col = "_KPX그룹_ffill" if "_KPX그룹_ffill" in info.columns else "KPX그룹"
+            for group, value in info.groupby(group_col)["설비용량(MW)"].sum().items():
+                meta_rows.append({"metric": "capacity_mw_by_group_from_info", "key": str(group), "value": float(value)})
+        if "KPX그룹" in info.columns and "그룹설비용량(MW)" in info.columns:
+            for group, value in info.groupby("KPX그룹")["그룹설비용량(MW)"].max().items():
+                meta_rows.append({"metric": "group_capacity_mw_declared", "key": str(group), "value": float(value)})
+    return pd.DataFrame(scada_rows), pd.DataFrame(meta_rows)
+
+
 def write_reports(results: Path, tables: dict[str, pd.DataFrame]) -> None:
     label_cov = tables["label_coverage"]
     ratio = tables["target_ratio_bin_summary"]
     metric_bins = tables["metric_generation_bin_summary"]
     data_quality = tables["data_quality_inventory"]
     timestamp = tables["timestamp_coverage"]
+    feature_inventory = tables.get("feature_inventory", pd.DataFrame())
+    feature_drift = tables.get("feature_drift_summary", pd.DataFrame())
+    feature_comp = tables.get("feature_composition_summary", pd.DataFrame())
+    scada_inventory = tables.get("scada_inventory", pd.DataFrame())
+    meta_inventory = tables.get("meta_inventory", pd.DataFrame())
 
     def md_table(df: pd.DataFrame, n: int = 20) -> str:
         return df.head(n).to_markdown(index=False)
@@ -417,11 +597,46 @@ def write_reports(results: Path, tables: dict[str, pd.DataFrame]) -> None:
     bin_focus["eligible_share"] = bin_focus["eligible_count"] / total_eligible_count
     bin_focus["actual_sum_share"] = bin_focus["actual_sum"] / total_actual_sum
 
-    route = "temporal drift audit plus feature inventory"
-    reason = "Target means and eligible distribution vary materially by year/month/hour; before feature engineering or HPO, quantify train-valid/test-facing drift and inspect feature coverage."
+    drift_fact_lines = []
+    if not feature_inventory.empty:
+        n_features = int(len(feature_inventory))
+        n_sources = feature_inventory["source"].nunique(dropna=True)
+        max_train_missing = float(feature_inventory["train_missing_rate"].max())
+        max_valid_missing = float(feature_inventory["valid_missing_rate"].max())
+        max_test_missing = float(feature_inventory["test_missing_rate"].max())
+        near_constant = int(feature_inventory["near_constant"].sum())
+        drift_fact_lines.extend(
+            [
+                f"- B1 aggregate feature count: {n_features:,} across {n_sources} source groups",
+                f"- max missing rate train/valid/test: {max_train_missing:.4f} / {max_valid_missing:.4f} / {max_test_missing:.4f}",
+                f"- near-constant feature count: {near_constant}",
+            ]
+        )
+    if not feature_drift.empty:
+        high_tv_ks = int(feature_drift["train_valid_ks"].gt(0.30).sum())
+        high_tt_ks = int(feature_drift["train_test_ks"].gt(0.30).sum())
+        high_tv_psi = int(feature_drift["train_valid_psi"].gt(0.25).sum())
+        high_tt_psi = int(feature_drift["train_test_psi"].gt(0.25).sum())
+        drift_fact_lines.extend(
+            [
+                f"- features with train-valid KS > 0.30: {high_tv_ks}",
+                f"- features with train-test KS > 0.30: {high_tt_ks}",
+                f"- features with train-valid PSI > 0.25: {high_tv_psi}",
+                f"- features with train-test PSI > 0.25: {high_tt_psi}",
+            ]
+        )
+    if not scada_inventory.empty:
+        drift_fact_lines.append(f"- SCADA files inventoried: {len(scada_inventory)}")
+    if not meta_inventory.empty:
+        info_rows = meta_inventory[meta_inventory["metric"].eq("rows")]
+        if not info_rows.empty:
+            drift_fact_lines.append(f"- info.xlsx turbine/meta rows: {int(info_rows.iloc[0]['value'])}")
+
+    route = "temporal drift and feature inventory audit"
+    reason = "Target means and eligible distribution vary materially by year/month/hour; B1 feature coverage is mostly stable, so the next non-modeling uncertainty is target/temporal structure unless data-quality blockers take precedence."
     if cap_exceed or neg:
         route = "data quality / cleansing audit"
-        reason = "Range violations exist in labels and must be explained before modeling changes."
+        reason = "Capacity-exceed label values exist and must be explained before any cleansing rule, model HPO, or feature expansion."
     elif any("missing_hour_gaps" in timestamp.columns and timestamp["missing_hour_gaps"].fillna(0).gt(0)):
         route = "data quality / timestamp coverage audit"
         reason = "Timestamp gaps are present and should be explained before modeling changes."
@@ -463,12 +678,32 @@ def write_reports(results: Path, tables: dict[str, pd.DataFrame]) -> None:
         "",
         md_table(tables["ficr_boundary_distribution"]),
         "",
+        "## B1 feature inventory and drift",
+        "",
+        "\n".join(drift_fact_lines) if drift_fact_lines else "Feature inventory was not available.",
+        "",
+        "### Feature source/stat composition",
+        "",
+        md_table(feature_comp) if not feature_comp.empty else "No feature composition table.",
+        "",
+        "### Top train-valid drift features",
+        "",
+        md_table(feature_drift.sort_values("train_valid_ks", ascending=False), 15) if not feature_drift.empty else "No feature drift table.",
+        "",
+        "### Top train-test drift features",
+        "",
+        md_table(feature_drift.sort_values("train_test_ks", ascending=False), 15) if not feature_drift.empty else "No feature drift table.",
+        "",
+        "## SCADA/meta inventory",
+        "",
+        md_table(scada_inventory) if not scada_inventory.empty else "No SCADA inventory table.",
+        "",
         "## Initial interpretation",
         "",
         "- The official metric excludes actual/capacity below 10%, so near-zero rows are primarily a training/data-behavior concern, not direct official-score mass.",
         "- The eligible set is dominated by 10~80% ratio bins by count, while high-ratio bins carry high actual mass and stricter underprediction risk.",
         "- Group/year coverage differs structurally because group3 has missing labels in 2022 by competition design.",
-        "- Before any more model HPO, the next decision should be based on target-year/time structure and feature coverage/drift, not on a single model's residuals alone.",
+        "- The correct next action is a focused audit issue, not another broad modeling run. The focused route must be selected from hard data-quality blockers, target/temporal shift, and B1 feature coverage/drift.",
     ]
     (results / "problem_framing.md").write_text("\n".join(problem), encoding="utf-8")
 
@@ -487,13 +722,14 @@ def write_reports(results: Path, tables: dict[str, pd.DataFrame]) -> None:
         "",
         "## Recommended next issue scope",
         "",
-        "If no hard data-quality blocker is present, open a focused `Temporal drift and feature inventory audit` issue:",
+        "Open a focused `Data quality / cleansing audit` issue first, because a hard label-range blocker is present:",
         "",
-        "- compare train years 2022/2023 vs validation 2024 target distributions by group/month/hour/bin",
-        "- inspect B1 feature inventory and train-valid/test feature coverage",
-        "- quantify feature drift and missingness drift",
-        "- connect drift/feature coverage to the generation regimes identified here",
-        "- do not train new models until this audit routes an intervention",
+        "- enumerate all capacity-exceed rows and their timestamp/target/month/hour/regime",
+        "- verify whether exceedance is true production, capacity metadata mismatch, rounding/noise, aggregation issue, or label anomaly",
+        "- test candidate cleansing rules diagnostically only: clip-to-capacity, remove rows, keep-as-is, target-specific rule",
+        "- replay historical validation without adding features or HPO to measure whether each rule changes metric-facing behavior",
+        "- decide one explicit policy: no cleansing, clipping, exclusion, or metadata correction",
+        "- only after this is resolved, move to temporal drift / feature sufficiency audit",
         "",
         "## Supporting tables",
         "",
@@ -509,6 +745,11 @@ def write_reports(results: Path, tables: dict[str, pd.DataFrame]) -> None:
         "- `ficr_boundary_distribution.csv`",
         "- `data_quality_inventory.csv`",
         "- `label_range_violations.csv`",
+        "- `feature_inventory.csv`",
+        "- `feature_drift_summary.csv`",
+        "- `feature_composition_summary.csv`",
+        "- `scada_inventory.csv`",
+        "- `meta_inventory.csv`",
     ]
     (results / "next_audit_routing.md").write_text("\n".join(routing), encoding="utf-8")
 
@@ -520,6 +761,8 @@ def main() -> None:
     inv, ts_cov = dataset_inventory(args.data_dir)
     labels = read_labels(args.data_dir)
     long = make_long_labels(labels)
+    feature_inventory, feature_drift, feature_comp = feature_inventory_and_drift(args.data_dir)
+    scada_inventory, meta_inventory = scada_meta_inventory(args.data_dir)
 
     tables = {
         "dataset_inventory": inv,
@@ -534,6 +777,11 @@ def main() -> None:
         "ficr_boundary_distribution": ficr_boundary_distribution(long),
         "data_quality_inventory": data_quality_inventory(args.data_dir, labels, long),
         "label_range_violations": label_range_violations(labels),
+        "feature_inventory": feature_inventory,
+        "feature_drift_summary": feature_drift,
+        "feature_composition_summary": feature_comp,
+        "scada_inventory": scada_inventory,
+        "meta_inventory": meta_inventory,
     }
 
     for name, df in tables.items():
