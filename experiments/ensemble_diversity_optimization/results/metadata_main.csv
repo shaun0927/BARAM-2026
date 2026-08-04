@@ -1,0 +1,40 @@
+﻿model_id,model_family,status,notes,train_seconds,predict_seconds
+lgbm_l1_baseline,LightGBM,ok,current B1/W4 baseline model; included as anchor; loaded cached prediction,,
+elastic_net,linear,ok,previously deferred; first-pass linear sparse baseline; loaded cached prediction,,
+huber_regressor,linear,ok,previously deferred; robust linear baseline; loaded cached prediction,,
+sgd_huber,linear,ok,fast robust linear SGD surrogate; loaded cached prediction,,
+knn_distance,neighbors,ok,distance-weighted KNN with robust scaling; loaded cached prediction,,
+radius_neighbors,neighbors,ok,radius neighbor feasibility with fallback outlier label; loaded cached prediction,,
+linear_svr,svm,ok,linear SVR sampled first-pass; loaded cached prediction,,
+nystroem_ridge,kernel,ok,kernel approximation + ridge; nonlinear low-rank diversity; loaded cached prediction,,
+svr_rbf_sampled,svm,ok,sampled RBF SVR feasibility; loaded cached prediction,,
+mlp_regressor,neural_sklearn,ok,sklearn MLP first-pass tabular neural baseline; loaded cached prediction,,
+hist_gbdt_absolute,sklearn HistGradientBoosting,ok,sklearn boosting absolute-error variant; loaded cached prediction,,
+gradient_boosting_quantile,sklearn GradientBoosting,ok,quantile boosting q=0.55 for underprediction-bias diversity; loaded cached prediction,,
+extra_trees_wide,sklearn ExtraTrees,ok,bagging diversity; wider than #4 first run; loaded cached prediction,,
+random_forest_wide,sklearn RandomForest,ok,bagging diversity; wider than #4 first run; loaded cached prediction,,
+lgbm_l1_leaf63_seed42,LightGBM,ok,ensemble-oriented L1 variant: larger leaves,22.64161769999191,0.18237310001859441
+lgbm_l1_leaf15_regularized,LightGBM,ok,ensemble-oriented L1 variant: conservative regularized tree,9.20642600004794,0.10310930002015084
+lgbm_l1_seed777,LightGBM,ok,ensemble-oriented L1 seed variant,12.024570200010203,0.10550150001654401
+extra_trees_leaf5_sqrt,sklearn ExtraTrees,ok,diversity ExtraTrees variant: sqrt features and larger leaves,3.526993900013622,0.3952226000255905
+extra_trees_bootstrap_leaf3,sklearn ExtraTrees,ok,diversity ExtraTrees variant: bootstrap,19.85585649992572,0.3500273000099696
+rf_leaf5_sqrt,sklearn RandomForest,ok,diversity RandomForest variant: sqrt features,6.960650100023486,0.3614616999984719
+hist_gbdt_quantile_055,sklearn HistGradientBoosting,ok,HistGBDT quantile q=0.55 diversity variant,26.81320220005,0.1669684000662528
+hist_gbdt_l2_leaf63,sklearn HistGradientBoosting,ok,HistGBDT squared-error variant with larger leaf budget,38.92655440006638,0.31058049999410287
+elastic_net_stronger_l1,linear,ok,linear diversity variant with stronger L1 ratio,6.360420900047757,0.08107909990940243
+huber_epsilon_18,linear,ok,robust linear diversity variant with wider Huber epsilon,5.404100400046445,0.0776297000120394
+mlp_regressor_medium,neural_sklearn,ok,medium sklearn MLP diversity variant,53.191613899951335,0.18163640005514026
+xgboost_pseudohuber,XGBoost,ok,XGBoost pseudo-Huber objective first-pass; loaded cached prediction,,
+xgboost_squarederror,XGBoost,ok,XGBoost squared-error diversity baseline; loaded cached prediction,,
+catboost_rmse,CatBoost,ok,CatBoost RMSE first-pass diversity; loaded cached prediction,,
+catboost_quantile_055,CatBoost,ok,CatBoost Quantile q=0.55 first-pass; loaded cached prediction,,
+catboost_quantile_050_depth6,CatBoost,ok,CatBoost Quantile q=0.50 ensemble-oriented variant,30.494324700033758,0.0365226999274455
+catboost_quantile_0525_depth6,CatBoost,ok,CatBoost Quantile q=0.525 ensemble-oriented variant,28.2721030000248,0.03506920003565028
+catboost_quantile_0575_depth6,CatBoost,ok,CatBoost Quantile q=0.575 ensemble-oriented variant,26.667491299915127,0.037624599935952574
+catboost_quantile_060_depth6,CatBoost,ok,CatBoost Quantile q=0.60 ensemble-oriented variant,30.978210800036322,0.0650802999152802
+catboost_quantile_055_depth4_reg,CatBoost,ok,CatBoost Quantile q=0.55 shallow regularized variant,17.51896300003864,0.05632580001838505
+catboost_quantile_055_depth8,CatBoost,ok,CatBoost Quantile q=0.55 deeper variant,95.94281239999691,0.0672222999855876
+flaml_automl,FLAML AutoML,ok,loaded cached prediction,,
+h2o_automl,H2O AutoML,ok,loaded cached prediction,,
+tabpfn_regressor,TabPFN,failed,failed: OSError: [WinError 10038] 소켓 이외의 개체에 작업을 시도했습니다,,
+tabm_torch,TabM,ok,loaded cached prediction,,

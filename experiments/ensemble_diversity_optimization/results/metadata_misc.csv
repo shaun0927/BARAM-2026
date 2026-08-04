@@ -1,0 +1,6 @@
+﻿model_id,model_family,status,notes,train_seconds,predict_seconds
+ngboost_normal,NGBoost,ok,loaded cached prediction,,
+ngboost_normal_260_lr03,NGBoost,ok,loaded cached prediction,,
+explainable_boosting,ExplainableBoostingMachine,ok,EBM first-pass sampled,163.88852189999307,0.210635400027968
+ebm_bins192_inter12,ExplainableBoostingMachine,ok,EBM diversity variant bins=192 interactions=12 single-process,386.32304220000515,0.23409749992424622
+ebm_low_interaction,ExplainableBoostingMachine,ok,EBM conservative low-interaction variant single-process,279.4330014999723,0.24938310001743957

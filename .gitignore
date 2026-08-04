@@ -2,5 +2,7 @@ __pycache__/
 *.py[cod]
 *.log
 .venvs/
+catboost_info/
 experiments/expanded_model_search/artifacts/
+experiments/ensemble_diversity_optimization/artifacts/
 experiments/cv_protocol/official_eval_download/nuxt/

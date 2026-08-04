@@ -1,0 +1,115 @@
+{
+  "baseline": {
+    "local_score": 0.6207259749,
+    "public_lb": 0.6220908318,
+    "alpha": 1.0275,
+    "accept_score": 0.6222259749
+  },
+  "current_anchor": {
+    "score": 0.6260900872,
+    "ficr": 0.3790961261,
+    "worst_month_score": 0.6012469333,
+    "weights": {
+      "catboost_quantile_055": 0.6,
+      "lgbm_l1_baseline": 0.2,
+      "extra_trees_wide": 0.2
+    },
+    "next_accept_score": 0.6264,
+    "strong_accept_score": 0.6268,
+    "high_confidence_score": 0.6271,
+    "recomputed_alpha": 1.03,
+    "recomputed_score": 0.6260900871556871
+  },
+  "best_model": {
+    "model_id": "catboost_quantile_0575_depth6",
+    "model_family": "CatBoost",
+    "raw_score": 0.6233589716932273,
+    "raw_1_nmae": 0.8721091275441599,
+    "raw_ficr": 0.3746088158422947,
+    "best_alpha": 1.03,
+    "alpha_score": 0.6297408614638184,
+    "alpha_1_nmae": 0.8711747178764078,
+    "alpha_ficr": 0.388307005051229,
+    "avg_nmae": 0.1288252821235922,
+    "delta_vs_baseline": 0.009014886563818325,
+    "worst_month_score": 0.6023877311834722,
+    "high_generation_score": 0.641978000380094,
+    "group_1_score": 0.6531115265895887,
+    "group_2_score": 0.6578040768458645,
+    "group_3_score": 0.5783069809560021,
+    "train_seconds": 26.667491299915127,
+    "predict_seconds": 0.0376245999359525,
+    "status": "ok",
+    "notes": "CatBoost Quantile q=0.575 ensemble-oriented variant",
+    "months_better_than_lgbm": 10.0,
+    "groups_better_than_lgbm": 3.0,
+    "months_better_than_current_anchor": 8.0,
+    "groups_better_than_current_anchor": 2.0,
+    "delta_vs_current_anchor": 0.003650774263818324
+  },
+  "best_ensemble": {
+    "ensemble_id": "w3_catboost_quantile_0575_depth6_catboost_quantile_060_depth6_lgbm_l1_baseline_0.70_0.20_0.10",
+    "model_id": "w3_catboost_quantile_0575_depth6_catboost_quantile_060_depth6_lgbm_l1_baseline_0.70_0.20_0.10",
+    "members": "catboost_quantile_0575_depth6+catboost_quantile_060_depth6+lgbm_l1_baseline",
+    "weights": "{\"catboost_quantile_0575_depth6\": 0.7, \"catboost_quantile_060_depth6\": 0.2, \"lgbm_l1_baseline\": 0.1}",
+    "best_alpha": 1.03,
+    "alpha_score": 0.6314912598569689,
+    "alpha_1_nmae": 0.8721636572530611,
+    "alpha_ficr": 0.39081886246087655,
+    "avg_nmae": 0.1278363427469389,
+    "delta_vs_baseline": 0.010765284956968824,
+    "worst_month_score": 0.6038740233136989,
+    "high_generation_score": 0.6425350509381161,
+    "delta_vs_current_anchor": 0.005401172656968822,
+    "candidate_class": "core"
+  },
+  "selected_candidate_kind": "ensemble",
+  "selected_candidate": {
+    "ensemble_id": "w3_catboost_quantile_0575_depth6_catboost_quantile_060_depth6_lgbm_l1_baseline_0.70_0.20_0.10",
+    "model_id": "w3_catboost_quantile_0575_depth6_catboost_quantile_060_depth6_lgbm_l1_baseline_0.70_0.20_0.10",
+    "members": "catboost_quantile_0575_depth6+catboost_quantile_060_depth6+lgbm_l1_baseline",
+    "weights": "{\"catboost_quantile_0575_depth6\": 0.7, \"catboost_quantile_060_depth6\": 0.2, \"lgbm_l1_baseline\": 0.1}",
+    "best_alpha": 1.03,
+    "alpha_score": 0.6314912598569689,
+    "alpha_1_nmae": 0.8721636572530611,
+    "alpha_ficr": 0.39081886246087655,
+    "avg_nmae": 0.1278363427469389,
+    "delta_vs_baseline": 0.010765284956968824,
+    "worst_month_score": 0.6038740233136989,
+    "high_generation_score": 0.6425350509381161,
+    "delta_vs_current_anchor": 0.005401172656968822,
+    "candidate_class": "core"
+  },
+  "accepted": true,
+  "submission_info": {
+    "created": true,
+    "path": "C:\\Users\\USER\\Desktop\\jh0927\\BARAM-2026\\experiments\\ensemble_diversity_optimization\\submissions\\submission_w3_catboost_quantile_0575_depth6_catboost_quantile_060_depth6_lgbm_l1_baseline_0.70_0.20_0.10_alpha.csv",
+    "rows": 8760,
+    "missing_predictions": 0,
+    "min_prediction": 0.0,
+    "max_prediction": 21600.0,
+    "columns_match": true,
+    "ids_match": true,
+    "dt_match": true
+  },
+  "package_status": {
+    "main": {
+      "lightgbm": true,
+      "xgboost": true,
+      "catboost": true,
+      "sklearn": true,
+      "optuna": true,
+      "flaml": true,
+      "h2o": true,
+      "tabpfn": true,
+      "tabm": true,
+      "torch": true
+    },
+    "external_metadata_files": [
+      "metadata_autogluon.csv",
+      "metadata_main.csv",
+      "metadata_misc.csv",
+      "metadata_pycaret.csv"
+    ]
+  }
+}

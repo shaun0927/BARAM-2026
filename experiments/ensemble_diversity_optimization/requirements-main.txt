@@ -1,0 +1,17 @@
+pandas
+numpy
+scikit-learn
+lightgbm
+xgboost
+catboost
+optuna
+optuna-integration
+flaml[automl]
+h2o
+tabpfn
+tabpfn-extensions
+tabm
+torch
+pyarrow
+seaborn
+tabulate

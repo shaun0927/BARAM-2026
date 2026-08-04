@@ -1,0 +1,2 @@
+﻿model_id,model_family,status,notes,train_seconds,predict_seconds
+autogluon_tabular,AutoGluon Tabular,ok,"AutoGluon first-pass; time_limit_per_target=240; leaders={'kpx_group_1': 'WeightedEnsemble_L2', 'kpx_group_2': 'WeightedEnsemble_L2', 'kpx_group_3': 'WeightedEnsemble_L2'}",892.5911006999668,13.900535700027831

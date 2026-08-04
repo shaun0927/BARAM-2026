@@ -1,0 +1,2 @@
+﻿model_id,model_family,status,notes,train_seconds,predict_seconds
+pycaret_compare,PyCaret,ok,"PyCaret compare_models first-pass; budget_time_minutes=3.0; leaders={'kpx_group_1': 'ExtraTreesRegressor(n_jobs=-1, random_state=42)', 'kpx_group_2': 'ExtraTreesRegressor(n_jobs=-1, random_state=42)', 'kpx_group_3': ""CatBoostRegressor(border_count=254, loss_function='RMSE', random_state=42, task_type='CPU', verbose=False)""}",599.0266945000621,1.2973119000089355
