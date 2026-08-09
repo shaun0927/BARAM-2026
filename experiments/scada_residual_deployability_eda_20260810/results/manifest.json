@@ -1,0 +1,25 @@
+{
+  "experiment": "scada_residual_deployability_eda_20260810",
+  "figures": [
+    "01_nwp_only_regime_detectability.png",
+    "02_test2025_predicted_scada_regime_exposure.png",
+    "03_nwp_only_regime_feature_importance.png",
+    "04_taxonomy_nwp_wind_surface.png",
+    "05_event_level_residual_duration.png",
+    "06_nwp_scada_bias_taxonomy_heatmap.png",
+    "07_power_curve_taxonomy_by_nwp_wind.png",
+    "08_ficr_boundary_by_scada_taxonomy.png"
+  ],
+  "tables": [
+    "event_level_nwp_context.csv",
+    "ficr_boundary_by_scada_taxonomy.csv",
+    "nwp_only_scada_regime_feature_importance.csv",
+    "nwp_only_scada_regime_separability.csv",
+    "nwp_scada_bias_by_taxonomy.csv",
+    "power_curve_taxonomy_by_nwp_wind.csv",
+    "taxonomy_nwp_weather_summary.csv",
+    "test2025_scada_regime_exposure.csv"
+  ],
+  "report": "conclusion.md",
+  "method_boundary": "SCADA is used only to define train-time teacher taxonomy; detectability and 2025 exposure use NWP/time features."
+}
