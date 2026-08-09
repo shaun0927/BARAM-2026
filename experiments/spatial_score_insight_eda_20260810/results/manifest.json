@@ -1,0 +1,14 @@
+{
+  "experiment": "spatial_score_insight_eda_20260810",
+  "anchor": "phase98_w4_phase60_lineage + Lower16",
+  "anchor_score": 0.6457168407870989,
+  "anchor_one_minus_nmae": 0.878514383978742,
+  "anchor_ficr": 0.4129192975954557,
+  "feature_families": [
+    "nearest_modal",
+    "static_corr_top",
+    "direction_conditional_top",
+    "soft_upstream"
+  ],
+  "verdict": "SPATIAL_SIGNAL_REAL_BUT_RESIDUAL_LEVER_UNPROVED"
+}
