@@ -58,5 +58,26 @@
     "scada_hourly_group_teacher.csv",
     "scada_label_residual_taxonomy_rows.csv",
     "scada_label_residual_taxonomy_summary.csv"
+  ],
+  "final_closure_figures": [
+    "20_model_ficr_transition_overlay.png",
+    "21_model_residual_by_nwp_scada_bias.png",
+    "22_column_dictionary_family_shift.png",
+    "23_column_dictionary_top_shifts.png",
+    "24_scada_residual_event_casebook.png",
+    "25_scada_residual_event_detail.png",
+    "26_model_family_monthly_residual_heatmap.png",
+    "27_model_family_actual_bin_delta.png",
+    "28_model_family_residual_correlation.png",
+    "29_model_family_monthly_residual_top_models.png"
+  ],
+  "final_closure_tables": [
+    "full_raw_weather_column_dictionary.csv",
+    "model_family_actual_bin_residual.csv",
+    "model_family_monthly_residual.csv",
+    "model_family_residual_correlation.csv",
+    "model_family_residual_summary.csv",
+    "scada_residual_event_casebook.csv",
+    "weather_column_family_summary.csv"
   ]
 }
