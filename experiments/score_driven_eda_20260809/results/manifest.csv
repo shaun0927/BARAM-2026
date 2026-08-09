@@ -1,0 +1,11 @@
+﻿artifact
+issue_body.md
+01_scada_taxonomy_score_opportunity.csv
+02_label_regime_score_surface.csv
+03_ficr_transition_by_regime.csv
+04_directional_top_grid.csv
+05_source_disagreement_error.csv
+06_lead_hour_error_sensitivity.csv
+07_2025_exposure_by_month.csv
+08_2025_exposure_top_features.csv
+09_score_insight_proof_matrix.csv

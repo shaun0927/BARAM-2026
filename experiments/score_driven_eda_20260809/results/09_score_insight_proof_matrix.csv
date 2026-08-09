@@ -1,0 +1,7 @@
+﻿hypothesis,evidence,status,next_model_action
+SCADA residual slices identify score risk,candidate error and FiCR transition differ by SCADA residual taxonomy,supported,"train residual guards by taxonomy proxy, but only with NWP-safe predictors"
+label regime controls score sensitivity,"boundary/high-power regimes have different row support, error and FiCR transitions",supported,"evaluate models by label-regime slices, not only total MAE"
+best spatial grid is wind-direction dependent,"{'kpx_group_1': 6, 'kpx_group_2': 4, 'kpx_group_3': 6} unique top grids by target",supported,use direction-conditioned upstream grid weights
+LDAPS-GFS disagreement marks error-prone cases,candidate error varies across disagreement bins; directionality is not monotonic for all groups,partially_supported,"use disagreement as uncertainty/regime feature, not a hard correction alone"
+lead hour should change model behavior,"lead-hour candidate error range={'kpx_group_1': 0.0473, 'kpx_group_2': 0.0413, 'kpx_group_3': 0.0405}",supported,include lead-hour interactions with source/grid/wind features
+2025 risk is month-concentrated,"top exposure months=[4, 2, 7, 6]",supported,weight validation/model selection by exposed months and features
