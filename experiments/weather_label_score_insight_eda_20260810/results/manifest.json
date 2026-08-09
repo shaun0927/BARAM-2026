@@ -1,0 +1,23 @@
+{
+  "experiment": "weather_label_score_insight_eda_20260810",
+  "anchor": "phase98_w4_phase60_lineage + lower16, proxy for phase154 local W4 anchor",
+  "tables": [
+    "results\\01_residual_by_ldaps_wind50_bins.csv",
+    "results\\02_monthly_correlation_stability.csv",
+    "results\\03_direction_conditioned_top_grid.csv",
+    "results\\04_disagreement_residual_risk.csv",
+    "results\\05_group_power_curve_by_ldaps_wind.csv",
+    "results\\06_ficr_boundary_by_wind.csv",
+    "results\\07_2025_label_relevant_weather_exposure.csv"
+  ],
+  "figures": [
+    "results\\figures\\01_residual_bias_wind_bins.png",
+    "results\\figures\\02_monthly_correlation_stability.png",
+    "results\\figures\\03_direction_conditioned_grid_corr.png",
+    "results\\figures\\04_disagreement_residual_risk.png",
+    "results\\figures\\05_group_power_curve_comparison.png",
+    "results\\figures\\06_ficr_boundary_by_wind.png",
+    "results\\figures\\07_2025_wind_exposure_risk.png"
+  ],
+  "issue_body": "issue_body.md"
+}
