@@ -6,3 +6,5 @@ catboost_info/
 experiments/expanded_model_search/artifacts/
 experiments/ensemble_diversity_optimization/artifacts/
 experiments/cv_protocol/official_eval_download/nuxt/
+experiments/comprehensive_eda_20260809/results/deep_dive/*_rows.csv
+experiments/comprehensive_eda_20260809/results/deep_dive/scada_hourly_group_teacher.csv

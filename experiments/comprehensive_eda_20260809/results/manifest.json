@@ -28,5 +28,35 @@
     "top_weather_grid_label_correlations.csv",
     "turbine_grid_distance_matrix.csv",
     "weather_grid_label_correlations.csv"
+  ],
+  "deep_dive_figures": [
+    "10_ficr_evaluation_support_surface.png",
+    "11_ficr_threshold_sensitive_slices.png",
+    "12_scada_residual_taxonomy.png",
+    "13_scada_residual_monthly_heatmap.png",
+    "14_nwp_scada_wind_bias_monthly.png",
+    "15_nwp_scada_wind_scatter.png",
+    "16_directional_spatial_corr_kpx_group_1.png",
+    "16_directional_spatial_corr_kpx_group_2.png",
+    "16_directional_spatial_corr_kpx_group_3.png",
+    "17_label_relevance_weighted_2025_exposure.png",
+    "18_top_weighted_2025_shift_features.png",
+    "19_model_residual_by_scada_taxonomy.png",
+    "20_model_ficr_transition_overlay.png",
+    "21_model_residual_by_nwp_scada_bias.png"
+  ],
+  "deep_dive_tables": [
+    "best_model_residual_by_nwp_scada_bias.csv",
+    "best_model_residual_overlay_by_scada_taxonomy.csv",
+    "best_model_residual_overlay_rows.csv",
+    "direction_conditional_ldaps_grid_corr.csv",
+    "direction_conditional_ldaps_top_grid.csv",
+    "label_relevance_weighted_2025_shift.csv",
+    "label_relevance_weighted_2025_shift_by_month.csv",
+    "nwp_scada_wind_bias_monthly.csv",
+    "nwp_scada_wind_bias_rows.csv",
+    "scada_hourly_group_teacher.csv",
+    "scada_label_residual_taxonomy_rows.csv",
+    "scada_label_residual_taxonomy_summary.csv"
   ]
 }
