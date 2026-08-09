@@ -1,0 +1,32 @@
+{
+  "result_dir": "C:\\Users\\USER\\Desktop\\jh0927\\BARAM-2026\\experiments\\comprehensive_eda_20260809\\results",
+  "figures": [
+    "01_column_contract_missingness.png",
+    "02_label_monthly_structure.png",
+    "03_label_ratio_distribution.png",
+    "04_forecast_time_contract.png",
+    "05_spatial_topology_turbines_grids.png",
+    "06_weather_grid_label_correlations.png",
+    "07_scada_label_reconstruction.png",
+    "08_scada_power_curve_clouds.png",
+    "09_test2025_weather_shift.png",
+    "10_ficr_evaluation_support_surface.png",
+    "11_ficr_threshold_sensitive_slices.png"
+  ],
+  "tables": [
+    "column_contract_audit.csv",
+    "ficr_sensitive_label_surface.csv",
+    "forecast_time_contract_summary.csv",
+    "info_turbine_metadata_parsed.csv",
+    "label_monthly_distribution.csv",
+    "nearest_grids_by_turbine.csv",
+    "scada_label_reconstruction_summary.csv",
+    "scada_reconstruction_kpx_group_1.csv",
+    "scada_reconstruction_kpx_group_2.csv",
+    "scada_reconstruction_kpx_group_3.csv",
+    "test2025_vs_valid2024_feature_shift.csv",
+    "top_weather_grid_label_correlations.csv",
+    "turbine_grid_distance_matrix.csv",
+    "weather_grid_label_correlations.csv"
+  ]
+}
