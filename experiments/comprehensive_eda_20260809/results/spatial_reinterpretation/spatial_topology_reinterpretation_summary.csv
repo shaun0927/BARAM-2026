@@ -1,0 +1,4 @@
+﻿target,group,modal_nearest_ldaps_grid,modal_nearest_turbines,static_top_corr_grid,static_top_corr,modal_nearest_grid_corr,corr_gap_static_minus_nearest,direction_sector_count,unique_direction_top_grids,sectors_where_direction_top_equals_nearest,sectors_where_direction_top_equals_static_top
+kpx_group_1,1,5,3,13,0.8075004374975355,0.6599537728242014,0.1475466646733341,8,6,1,1
+kpx_group_2,2,6,3,13,0.8127937663574298,0.7861044899829329,0.026689276374496917,8,4,0,2
+kpx_group_3,3,12,4,13,0.8263124368994054,0.8239621807706782,0.0023502561287271906,8,6,1,0

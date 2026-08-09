@@ -143,15 +143,35 @@ Artifacts:
 
 ### 해석
 
-- GFS 9개 grid는 발전단지 주변을 매우 coarse하게 감싸는 구조입니다.
-- LDAPS 16개 grid는 터빈 cluster와 같은 작은 영역에 밀집해 있습니다.
-- nearest grid와 highest-correlation grid가 항상 같은지는 아직 별도 검증 대상입니다. 현재 broad spatial feature dump가 실패했다고 해서 spatial structure 자체가 무의미하다고 결론내리면 안 됩니다.
+- 이 그림은 **기하학적 topology만 보여주는 그림**입니다. 즉 터빈, LDAPS grid, GFS grid가 어디에 있는지는 보여주지만, 어떤 grid가 가장 예측력이 좋은지는 증명하지 않습니다.
+- GFS 9개 grid는 발전단지 주변을 매우 coarse하게 감싸는 구조이고, LDAPS 16개 grid는 터빈 cluster 주변의 작은 영역에 더 촘촘히 걸쳐 있습니다.
+- 하지만 nearest grid와 highest-correlation grid는 같은 개념이 아닙니다. 실제 보완 분석에서는 modal nearest LDAPS grid가 group1 `5`, group2 `6`, group3 `12`인 반면, static highest-correlation LDAPS grid는 세 group 모두 `13`으로 나옵니다.
+- 더 중요한 것은 풍향 조건부로 top grid가 계속 바뀐다는 점입니다. group1은 8개 방향 sector에서 6개 grid, group2는 4개 grid, group3는 6개 grid가 top으로 등장합니다.
+- 따라서 이 섹션의 결론은 “가까운 grid 하나를 쓰면 된다”가 아니라, **spatial signal은 direction-conditioned / upstream-like feature로 설계해야 한다**입니다.
+- broad spatial feature dump가 실패했다고 해서 spatial structure 자체가 무의미하다고 결론내리면 안 됩니다. 실패한 것은 topology 해석이 아니라, topology를 모델 feature로 옮긴 방식일 수 있습니다.
+
+![Spatial topology reinterpretation](https://raw.githubusercontent.com/shaun0927/BARAM-2026/main/experiments/comprehensive_eda_20260809/results/figures/30_spatial_topology_reinterpretation.png)
+
+### 정량 재해석
+
+| target | modal nearest LDAPS | static corr-top LDAPS | corr gap top-nearest | unique direction-top grids | direction sectors equal nearest |
+|---|---:|---:|---:|---:|---:|
+| `kpx_group_1` | 5 | 13 | +0.148 | 6 | 1/8 |
+| `kpx_group_2` | 6 | 13 | +0.027 | 4 | 0/8 |
+| `kpx_group_3` | 12 | 13 | +0.002 | 6 | 1/8 |
+
+### 모델링 관점의 결론
+
+- `nearest_grid_value`는 geometry prior일 뿐이고, 단독 feature 정책으로는 부족합니다.
+- `static top grid`도 전체 평균 correlation 기준일 뿐이라 direction regime을 놓칩니다.
+- 다음 spatial feature는 turbine centroid와 wind vector를 이용한 soft upstream weighting, 또는 direction-conditioned top-grid pooling이어야 합니다.
+- spatial EDA의 최종 검증은 label correlation이 아니라 current-anchor residual이 줄어드는지로 해야 합니다.
 
 ### 다음 검증
 
-- turbine별 nearest LDAPS/GFS grid와 label-correlation top grid 비교.
-- 풍향별 upstream grid selection.
-- group1/2 VESTAS split과 group3 UNISON split을 반영한 group-specific spatial feature.
+- direction-conditioned top-grid feature와 soft-upstream feature를 같은 validation contract에서 비교.
+- group1/2 VESTAS split과 group3 UNISON split을 반영한 group-specific spatial pooling.
+- spatial feature가 FiCR boundary 및 current-anchor residual을 실제로 개선하는지 검증.
 
 ---
 
