@@ -1,0 +1,7 @@
+﻿claim,evidence,status,model_consequence
+lead_hour is not independent from hour,violations=0; 24 target hours map deterministically to leads 12-35,proved,avoid interpreting hour and lead as independent causal signals
+lead_hour has score-relevant error structure,"candidate abs-error range by target={'kpx_group_1': 0.0473, 'kpx_group_2': 0.0413, 'kpx_group_3': 0.0405}",supported,use lead interactions and report validation by lead
+issue-cycle bias exists,"95th percentile absolute cycle signed error={'kpx_group_1': 0.1592, 'kpx_group_2': 0.188, 'kpx_group_3': 0.1607}",supported,consider cycle-level calibration/regime features
+test-time-available ramps are usable but weak proxies,"best Spearman with actual ramp={'kpx_group_1': 0.171, 'kpx_group_2': 0.169, 'kpx_group_3': 0.157}",partially_supported,"use as interactions/uncertainty features, not standalone fixes"
+target-time label lags are tempting but non-deployable,"max corr by availability={False: 0.964, True: 0.832}",proved,separate target lag experiments from forecast-safe features
+2025 shift is lead-month specific,"top shifted month/lead cells=[{'month': 4, 'lead_hour': 34}, {'month': 4, 'lead_hour': 33}, {'month': 4, 'lead_hour': 35}, {'month': 4, 'lead_hour': 32}, {'month': 4, 'lead_hour': 31}]",supported,"stress-test exposed lead-month cells, not only full-year 2024"
